@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+  background-color: #0f1115;
+}
+
+@import "primeicons/primeicons.css";
+
+@font-face {
+  font-family: 'Iosevka';
+  src: url('./app/assets/fonts/Iosevka_Charon/IosevkaCharon-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Iosevka-Mono';
+  src: url('./app/assets/fonts/Iosevka_Charon_Mono/IosevkaCharonMono-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Iosevka-Mono-Bold';
+  src: url('./app/assets/fonts/Iosevka_Charon_Mono/IosevkaCharonMono-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+

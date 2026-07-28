@@ -1,0 +1,231 @@
+:host {
+  --tux-bg: #0f1115;
+  --tux-surface: #1c2027;
+  --tux-border: #3a4049;
+  --tux-border-subtle: #2a2f38;
+  --tux-text: #f5f4ef;
+  --tux-text-muted: #8b8f97;
+  --tux-primary: #f2a623;
+  --tux-primary-text: #412402;
+  --tux-accent: #5dcaa5;
+
+  display: block;
+}
+
+.login-page {
+  font-family: 'Iosevka';
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tux-bg);
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--tux-surface);
+  border: 1px solid var(--tux-border-subtle);
+  border-radius: 12px;
+  padding: 2rem 1.75rem;
+}
+
+.login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.75rem;
+
+  .icone-tuxtalk {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .login-title {
+    font-size: 35px;
+    font-weight: 500;
+    font-family: 'Iosevka-Mono';
+    color: var(--tux-text);
+    margin: 0;
+  }
+
+  .login-subtitle {
+    font-size: 13px;
+    font-family: 'Iosevka-Mono';
+    color: var(--tux-text-muted);
+    margin: 0;
+  }
+}
+
+.p-button {
+  color: var(--tux-accent);
+}
+
+.field {
+  margin-bottom: 14px;
+  background-color: var(--tux-bg);
+  color: var(--tux-text-muted);
+  padding: 0.5rem;
+  border-radius: 10px;
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--tux-text);
+  }
+
+  .field-error {
+    display: block;
+    color: #e24b4a;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}
+
+.forgot-link {
+  display: block;
+  text-align: right;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: var(--tux-accent);
+  text-decoration: none;
+  margin-bottom: 1rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.signup-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--tux-text-muted);
+  margin: 1.5rem 0 0;
+
+  a {
+    color: var(--tux-accent);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.divider-text {
+  font-size: auto;
+  color: var(--tux-text-muted);
+  background-color: var(--tux-surface);
+  padding: 0 0.5rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+// Overrides pontuais nos componentes PrimeNG para casar com a paleta do TuxTalk.
+// Em vez de sobrescrever tudo aqui, o ideal a médio prazo é criar um preset de tema
+// PrimeNG dedicado (via definePreset) — isso aqui serve pro protótipo/MVP.
+:host ::ng-deep {
+  // Ajuste do container de Password do PrimeNG
+  p-password {
+    display: block;
+    width: 100%;
+  }
+
+  .p-password {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    // Tira bordas/fundo padrão do input do PrimeNG para usar o estilo da sua .field
+    .p-inputtext {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--tux-text-muted);
+      padding-right: 2.5rem; // Espaço para as bolinhas não passarem por cima do olho
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    // Força o ícone do olho (toggleMask) para a ponta direita
+    .p-password-toggle-mask,
+    .p-icon-field-right > i,
+    svg {
+      position: absolute !important;
+      right: 0.5rem !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      left: auto !important; // Evita que fique colado na esquerda
+      cursor: pointer;
+      color: var(--tux-text-muted);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        color: var(--tux-text);
+      }
+    }
+  }
+}
+
+  .login-submit {
+    background-color: var(--tux-primary);
+    border: 1px solid var(--tux-border);
+    color: var(--tux-bg);
+    font-weight: 800;
+    height: 2.5rem;
+    border-radius: 8px;
+    justify-content: center;
+    gap: 8px;
+
+    &:not(:disabled):hover {
+      background: color-mix(in srgb, var(--tux-primary) 90%, black);
+    }
+  }
+
+  .login-google {
+    margin-bottom: 1rem;
+  }
+
+  .login-github, .login-google {
+    .p-button-icon {
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    background: transparent;
+    border: 1px solid var(--tux-border);
+    color: var(--tux-text);
+    height: 2.5rem;
+    border-radius: 8px;
+    justify-content: center;
+    gap: 8px;
+
+    &:not(:disabled):hover {
+      background: var(--tux-border-subtle);
+    }
+  }
+
+  .login-error {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .p-divider.p-divider-horizontal {
+    margin: 1.5rem 0;
+    padding: 0 2rem;
+
+    &:before {
+      border-top-color: var(--tux-border-subtle);
+    }
+  }

@@ -1,0 +1,89 @@
+<div class="login-page">
+  <div class="login-card">
+
+    <div class="login-header">
+      <img class="icone-tuxtalk" src="/assets/tuxtalk-icon.png" alt="tuxtalk">
+      <p class="login-title">TuxTalk</p>
+      <p class="login-subtitle">entre para continuar</p>
+    </div>
+
+    <p-message
+      *ngIf="erroLogin"
+      severity="error"
+      [text]="erroLogin"
+      styleClass="login-error"
+    ></p-message>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="field">
+        <label for="identificador">usuário ou email</label>
+        <input
+          id="identificador"
+          type="text"
+          pInputText
+          formControlName="identificador"
+          placeholder="tux@tuxtalk.dev"
+          class="w-full"
+        />
+        <small class="field-error" *ngIf="identificador.invalid && identificador.touched">
+          informe seu usuário ou email
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="senha">senha</label>
+        <p-password
+          inputId="senha"
+          formControlName="senha"
+          [feedback]="false"
+          [toggleMask]="true"
+          placeholder="Insira sua senha."
+          class="w-full"
+          inputStyleClass="w-full"
+        ></p-password>
+        <small class="field-error" *ngIf="senha.invalid && senha.touched">
+          A senha deve ter ao menos 6 caracteres.
+        </small>
+      </div>
+
+      <a routerLink="/redefinir-senha" class="forgot-link">Esqueci minha senha</a>
+
+      <button
+        pButton
+        type="submit"
+        label="Entrar"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [loading]="carregando"
+        class="login-submit w-full"
+      >
+      </button>
+    </form>
+
+    <p-divider align="center">
+      <span class="divider-text">ou</span>
+    </p-divider>
+
+    <button
+      pButton
+      type="button"
+      label="Continuar com Google"
+      icon="pi pi-google"
+      class="login-google w-full"
+      (click)="onLoginGithub()"
+    ></button>
+
+    <button
+      pButton
+      type="button"
+      label="Continuar com Github"
+      icon="pi pi-github"
+      class="login-github w-full"
+      (click)="onLoginGithub()"
+    ></button>
+
+    <p class="signup-hint">
+      Novo por aqui? <a routerLink="/cadastro">Criar conta</a>
+    </p>
+  </div>
+</div>
