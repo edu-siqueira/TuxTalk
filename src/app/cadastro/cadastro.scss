@@ -1,0 +1,201 @@
+:host {
+  --tux-bg: #0f1115;
+  --tux-surface: #1c2027;
+  --tux-border: #3a4049;
+  --tux-border-subtle: #2a2f38;
+  --tux-text: #f5f4ef;
+  --tux-text-muted: #8b8f97;
+  --tux-primary: #f2a623;
+  --tux-primary-text: #412402;
+  --tux-accent: #5dcaa5;
+
+  display: block;
+}
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tux-bg);
+  padding: 2rem 1rem;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--tux-surface);
+  border: 1px solid var(--tux-border-subtle);
+  border-radius: 12px;
+  padding: 2rem 1.75rem;
+}
+
+.register-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+
+  .register-logo {
+    width: 46px;
+    height: 36px;
+
+    .logo-fg {
+      fill: var(--tux-text);
+    }
+
+    .logo-bg {
+      fill: var(--tux-surface);
+    }
+
+    .logo-beak {
+      fill: var(--tux-primary);
+    }
+  }
+
+  .register-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--tux-text);
+    margin: 0;
+  }
+
+  .register-subtitle {
+    font-size: 13px;
+    color: var(--tux-text-muted);
+    margin: 0;
+  }
+}
+
+.field {
+  margin-bottom: 14px;
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--tux-text-muted);
+    margin-bottom: 4px;
+  }
+
+  .field-error {
+    display: block;
+    color: #e24b4a;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}
+
+.terms-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 12px;
+  color: var(--tux-text-muted);
+  cursor: pointer;
+
+  a {
+    color: var(--tux-accent);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.login-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--tux-text-muted);
+  margin: 1.5rem 0 0;
+
+  a {
+    color: var(--tux-accent);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.divider-text {
+  font-size: 12px;
+  color: var(--tux-text-muted);
+}
+
+.w-full {
+  width: 100%;
+}
+
+// Mesmo padrão de overrides pontuais do LoginComponent — candidato a virar
+// um preset de tema PrimeNG compartilhado entre as telas de auth.
+:host ::ng-deep {
+  input.p-inputtext,
+  .p-password input {
+    background: var(--tux-bg);
+    border: 1px solid var(--tux-border);
+    color: var(--tux-text);
+    border-radius: 8px;
+    height: 36px;
+
+    &:enabled:focus {
+      border-color: var(--tux-primary);
+      box-shadow: 0 0 0 1px var(--tux-primary);
+    }
+  }
+
+  .p-checkbox .p-checkbox-box {
+    background: var(--tux-bg);
+    border-color: var(--tux-border);
+
+    &.p-highlight {
+      background: var(--tux-primary);
+      border-color: var(--tux-primary);
+    }
+  }
+
+  .register-submit {
+    background: var(--tux-primary);
+    border-color: var(--tux-primary);
+    color: var(--tux-primary-text);
+    font-weight: 500;
+    height: 36px;
+    border-radius: 8px;
+    justify-content: center;
+
+    &:not(:disabled):hover {
+      background: color-mix(in srgb, var(--tux-primary) 90%, black);
+    }
+  }
+
+  .register-oauth {
+    background: transparent;
+    border: 1px solid var(--tux-border);
+    color: var(--tux-text);
+    height: 36px;
+    border-radius: 8px;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+
+    &:not(:disabled):hover {
+      background: var(--tux-border-subtle);
+    }
+  }
+
+  .register-error {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .p-divider.p-divider-horizontal {
+    margin: 1.5rem 0;
+
+    &:before {
+      border-top-color: var(--tux-border-subtle);
+    }
+  }
+}

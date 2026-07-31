@@ -6,6 +6,12 @@ interface LoginResponse {
   token: string;
 }
 
+interface CadastroPayload {
+  username: string;
+  email: string;
+  senha: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -17,7 +23,17 @@ export class AuthService {
       .pipe(tap((res) => localStorage.setItem('tuxtalk_token', res.token)));
   }
 
+  registrar(payload: CadastroPayload): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/registrar`, payload)
+      .pipe(tap((res) => localStorage.setItem('tuxtalk_token', res.token)));
+  }
+
   redirecionarParaGithub(): void {
     window.location.href = `${this.apiUrl}/github`;
+  }
+
+  redirecionarParaGoogle(): void {
+    window.location.href = `${this.apiUrl}/google`;
   }
 }

@@ -33,11 +33,6 @@
     gap: 8px;
   }
 
-  .brand-logo {
-    width: 4rem;
-    height: 4rem;
-  }
-
   .brand-name {
     color: var(--tux-text);
     font-weight: 500;
@@ -66,6 +61,11 @@
   text-align: center;
   padding: 3.5rem 1.5rem 3rem;
   font: var(--tux-font);
+
+  .brand-logo {
+    width: 8rem;
+    height: 8rem;
+  }
 
   .hero-title {
     color: var(--tux-text);
@@ -155,7 +155,7 @@
   background: var(--tux-primary);
   color: var(--tux-primary-text);
   border: none;
-  font-weight: 500;
+  font-weight: 800;
 
   &:hover {
     background: color-mix(in srgb, var(--tux-primary) 90%, black);

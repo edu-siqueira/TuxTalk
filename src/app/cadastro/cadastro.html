@@ -1,0 +1,122 @@
+<div class="register-page">
+  <div class="register-card">
+
+    <div class="register-header">
+      <img class='register-logo' src="../assets/tuxtalk-icon.png" alt="logo-tuxtalk" srcset="">
+      <p class="register-title">criar conta</p>
+      <p class="register-subtitle">bem-vindo ao tuxtalk</p>
+    </div>
+
+    <p-message
+      *ngIf="erroCadastro"
+      severity="error"
+      [text]="erroCadastro"
+      styleClass="register-error"
+    ></p-message>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="field">
+        <label for="username">nome de usuário</label>
+        <input
+          id="username"
+          type="text"
+          pInputText
+          formControlName="username"
+          placeholder="tux"
+          class="w-full"
+        />
+        <small class="field-error" *ngIf="username.invalid && username.touched">
+          use ao menos 3 caracteres
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="email">email</label>
+        <input
+          id="email"
+          type="text"
+          pInputText
+          formControlName="email"
+          placeholder="tux@tuxtalk.dev"
+          class="w-full"
+        />
+        <small class="field-error" *ngIf="email.invalid && email.touched">
+          informe um email válido
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="senha">senha</label>
+        <p-password
+          inputId="senha"
+          formControlName="senha"
+          [feedback]="false"
+          [toggleMask]="true"
+          placeholder="mínimo 8 caracteres"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        ></p-password>
+        <small class="field-error" *ngIf="senha.invalid && senha.touched">
+          a senha deve ter ao menos 8 caracteres
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="confirmarSenha">confirmar senha</label>
+        <p-password
+          inputId="confirmarSenha"
+          formControlName="confirmarSenha"
+          [feedback]="false"
+          [toggleMask]="true"
+          placeholder="repita a senha"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        ></p-password>
+        <small class="field-error" *ngIf="senhasDiferem">
+          as senhas não coincidem
+        </small>
+      </div>
+
+      <label class="terms-check">
+        <p-checkbox formControlName="aceitaTermos" [binary]="true"></p-checkbox>
+        <span>concordo com os <a routerLink="/termos">termos de uso</a></span>
+      </label>
+
+      <button
+        pButton
+        type="submit"
+        label="criar conta"
+        icon="pi pi-arrow-up-right"
+        iconPos="right"
+        [loading]="carregando"
+        styleClass="register-submit w-full"
+      ></button>
+    </form>
+
+    <p-divider align="center">
+      <span class="divider-text">ou</span>
+    </p-divider>
+
+    <button
+      pButton
+      type="button"
+      label="continuar com google"
+      icon="pi pi-google"
+      styleClass="register-oauth w-full"
+      (click)="onCadastroGoogle()"
+    ></button>
+
+    <button
+      pButton
+      type="button"
+      label="continuar com github"
+      icon="pi pi-github"
+      styleClass="register-oauth w-full"
+      (click)="onCadastroGithub()"
+    ></button>
+
+    <p class="login-hint">
+      já tem conta? <a routerLink="/login">entrar</a>
+    </p>
+  </div>
+</div>
