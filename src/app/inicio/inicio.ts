@@ -19,17 +19,17 @@ export class InicioComponent {
   readonly destaques: Destaque[] = [
     {
       icone: 'pi pi-th-large',
-      titulo: 'categorias',
+      titulo: 'Categorias',
       descricao: 'distros, dotfiles, troubleshooting e mais.',
     },
     {
       icone: 'pi pi-comments',
-      titulo: 'discussão direta',
+      titulo: 'Discussões diretas',
       descricao: 'comentários simples, sem burocracia.',
     },
     {
       icone: 'pi pi-arrow-up',
-      titulo: 'upvote',
+      titulo: 'Upvotes',
       descricao: 'o melhor conteúdo sobe pro topo.',
     },
   ];

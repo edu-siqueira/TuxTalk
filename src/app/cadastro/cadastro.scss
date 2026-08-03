@@ -13,6 +13,7 @@
 }
 
 .register-page {
+  font-family: 'Iosevka';
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -38,31 +39,21 @@
   margin-bottom: 1.5rem;
 
   .register-logo {
-    width: 46px;
-    height: 36px;
-
-    .logo-fg {
-      fill: var(--tux-text);
-    }
-
-    .logo-bg {
-      fill: var(--tux-surface);
-    }
-
-    .logo-beak {
-      fill: var(--tux-primary);
-    }
+    width: 5rem;
+    height: 5rem;
   }
 
   .register-title {
-    font-size: 18px;
+    font-size: 35px;
     font-weight: 500;
+    font-family: 'Iosevka-Mono';
     color: var(--tux-text);
     margin: 0;
   }
 
   .register-subtitle {
     font-size: 13px;
+    font-family: 'Iosevka-Mono';
     color: var(--tux-text-muted);
     margin: 0;
   }
@@ -70,12 +61,15 @@
 
 .field {
   margin-bottom: 14px;
+  background-color: var(--tux-bg);
+  color: var(--tux-text-muted);
+  padding: 0.5rem;
+  border-radius: 10px;
 
   label {
     display: block;
     font-size: 13px;
-    color: var(--tux-text-muted);
-    margin-bottom: 4px;
+    color: var(--tux-text);
   }
 
   .field-error {
@@ -122,8 +116,10 @@
 }
 
 .divider-text {
-  font-size: 12px;
+  font-size: auto;
   color: var(--tux-text-muted);
+  background-color: var(--tux-surface);
+  padding: 0 0.5rem;
 }
 
 .w-full {
@@ -136,15 +132,8 @@
   input.p-inputtext,
   .p-password input {
     background: var(--tux-bg);
-    border: 1px solid var(--tux-border);
-    color: var(--tux-text);
+    color: var(--tux-text-muted);
     border-radius: 8px;
-    height: 36px;
-
-    &:enabled:focus {
-      border-color: var(--tux-primary);
-      box-shadow: 0 0 0 1px var(--tux-primary);
-    }
   }
 
   .p-checkbox .p-checkbox-box {
@@ -158,13 +147,14 @@
   }
 
   .register-submit {
-    background: var(--tux-primary);
-    border-color: var(--tux-primary);
-    color: var(--tux-primary-text);
-    font-weight: 500;
-    height: 36px;
+    background-color: var(--tux-primary);
+    border: 1px solid var(--tux-border);
+    color: var(--tux-bg);
+    font-weight: 800;
+    height: 2.5rem;
     border-radius: 8px;
     justify-content: center;
+    gap: 8px;
 
     &:not(:disabled):hover {
       background: color-mix(in srgb, var(--tux-primary) 90%, black);
@@ -198,4 +188,24 @@
       border-top-color: var(--tux-border-subtle);
     }
   }
+
+  .p-password-toggle-mask,
+    .p-icon-field-right > i,
+    svg {
+      position: absolute !important;
+      right: 0.5rem !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      left: auto !important; // Evita que fique colado na esquerda
+      cursor: pointer;
+      color: var(--tux-text-muted);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        color: var(--tux-text);
+      }
+    }
 }

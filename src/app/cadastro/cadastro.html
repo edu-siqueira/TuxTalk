@@ -2,9 +2,9 @@
   <div class="register-card">
 
     <div class="register-header">
-      <img class='register-logo' src="../assets/tuxtalk-icon.png" alt="logo-tuxtalk" srcset="">
-      <p class="register-title">criar conta</p>
-      <p class="register-subtitle">bem-vindo ao tuxtalk</p>
+      <img class='register-logo' src="tuxtalk-icon.png" alt="logo-tuxtalk" srcset="">
+      <p class="register-title">Criar conta</p>
+      <p class="register-subtitle">Bem-vindo ao tuxtalk</p>
     </div>
 
     <p-message
@@ -16,7 +16,7 @@
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <div class="field">
-        <label for="username">nome de usuário</label>
+        <label for="username">Nome de usuário</label>
         <input
           id="username"
           type="text"
@@ -26,12 +26,12 @@
           class="w-full"
         />
         <small class="field-error" *ngIf="username.invalid && username.touched">
-          use ao menos 3 caracteres
+          O nome de usuário deve ter pelo menos 3 caracteres.
         </small>
       </div>
 
       <div class="field">
-        <label for="email">email</label>
+        <label for="email">E-mail</label>
         <input
           id="email"
           type="text"
@@ -41,12 +41,12 @@
           class="w-full"
         />
         <small class="field-error" *ngIf="email.invalid && email.touched">
-          informe um email válido
+          Informe um email válido
         </small>
       </div>
 
       <div class="field">
-        <label for="senha">senha</label>
+        <label for="senha">Senha</label>
         <p-password
           inputId="senha"
           formControlName="senha"
@@ -57,66 +57,65 @@
           inputStyleClass="w-full"
         ></p-password>
         <small class="field-error" *ngIf="senha.invalid && senha.touched">
-          a senha deve ter ao menos 8 caracteres
+          A senha deve ter ao menos 8 caracteres.
         </small>
       </div>
 
       <div class="field">
-        <label for="confirmarSenha">confirmar senha</label>
+        <label for="confirmarSenha">Confirmar senha</label>
         <p-password
           inputId="confirmarSenha"
           formControlName="confirmarSenha"
           [feedback]="false"
           [toggleMask]="true"
           placeholder="repita a senha"
-          styleClass="w-full"
-          inputStyleClass="w-full"
+          class="w-full"
         ></p-password>
         <small class="field-error" *ngIf="senhasDiferem">
-          as senhas não coincidem
+          As senhas não coincidem.
         </small>
       </div>
 
       <label class="terms-check">
         <p-checkbox formControlName="aceitaTermos" [binary]="true"></p-checkbox>
-        <span>concordo com os <a routerLink="/termos">termos de uso</a></span>
+        <span>Concordo com os <a routerLink="/termos">termos de uso</a></span>
       </label>
 
       <button
         pButton
         type="submit"
-        label="criar conta"
-        icon="pi pi-arrow-up-right"
+        label="Cadastrar"
+        icon="pi pi-arrow-right"
         iconPos="right"
         [loading]="carregando"
-        styleClass="register-submit w-full"
+        class="register-submit w-full"
       ></button>
     </form>
 
     <p-divider align="center">
-      <span class="divider-text">ou</span>
+      <span class="divider-text">Ou</span>
     </p-divider>
 
     <button
       pButton
       type="button"
-      label="continuar com google"
+      label="Continuar com Google"
       icon="pi pi-google"
-      styleClass="register-oauth w-full"
+      class="register-oauth w-full"
       (click)="onCadastroGoogle()"
     ></button>
 
     <button
       pButton
       type="button"
-      label="continuar com github"
+      label="Continuar com Github"
       icon="pi pi-github"
-      styleClass="register-oauth w-full"
+      class="register-oauth w-full"
       (click)="onCadastroGithub()"
     ></button>
 
     <p class="login-hint">
-      já tem conta? <a routerLink="/login">entrar</a>
+      Já tem conta? <a routerLink="/login">Entrar</a>
     </p>
   </div>
 </div>
