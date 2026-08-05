@@ -9,7 +9,9 @@ import { PasswordModule } from 'primeng/password';
 import { DividerModule } from 'primeng/divider';
 import { MessageModule } from 'primeng/message';
 
-import { AuthService } from '../services/Auth.service';
+import { AuthService } from '../../services/Auth.service';
+
+import * as AOS from 'aos';
 
 @Component({
   selector: 'app-login',
@@ -34,6 +36,19 @@ export class LoginComponent {
 
   carregando = false;
   erroLogin: string | null = null;
+
+  ngOnInit() {
+    AOS.init({
+      duration: 1200,
+      once: true
+    });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      AOS.refresh();
+    }, 100);
+  }
 
   form = this.fb.nonNullable.group({
     identificador: ['', [Validators.required]],

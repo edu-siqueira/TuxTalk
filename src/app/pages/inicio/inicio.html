@@ -11,7 +11,7 @@
     </div>
   </nav>
 
-  <section class="hero">
+  <section class="hero" data-aos="fade-down">
     <img class="brand-logo" src="tuxtalk-icon.png" alt="icone TuxTalk" srcset="">
     <h1 class="hero-title">Onde a comunidade Linux<br />troca ideias de verdade.</h1>
     <p class="hero-subtitle">Dúvidas, dotfiles, distros e discussões: sem ruído, sem enrolação.</p>
@@ -21,7 +21,7 @@
     </div>
   </section>
 
-  <section class="destaques">
+  <section class="destaques" data-aos="fade-down">
     <div class="destaque-card" *ngFor="let destaque of destaques">
       <i [class]="destaque.icone" aria-hidden="true"></i>
       <p class="destaque-titulo">{{ destaque.titulo }}</p>

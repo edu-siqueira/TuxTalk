@@ -16,7 +16,9 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
 import { MessageModule } from 'primeng/message';
 
-import { AuthService } from '../services/Auth.service';
+import { AuthService } from '../../services/Auth.service';
+
+import * as AOS from 'aos';
 
 // Validator de grupo: compara senha e confirmarSenha. Fica fora da classe
 // porque não depende de estado da instância — evita recriar a função a cada render.
@@ -50,6 +52,19 @@ export class CadastroComponent {
 
   carregando = false;
   erroCadastro: string | null = null;
+
+  ngOnInit() {
+    AOS.init({
+      duration: 1200,
+      once: true
+    });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      AOS.refresh();
+    }, 100);
+  }
 
   form = this.fb.nonNullable.group(
     {

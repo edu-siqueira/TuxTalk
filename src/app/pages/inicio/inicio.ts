@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import * as AOS from 'aos';
 
 interface Destaque {
   icone: string;
@@ -16,21 +17,35 @@ interface Destaque {
   styleUrls: ['./inicio.scss'],
 })
 export class InicioComponent {
+
+  ngOnInit() {
+    AOS.init({
+      duration: 1200,
+      once: true
+    });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      AOS.refresh();
+    }, 100);
+  }
+
   readonly destaques: Destaque[] = [
     {
       icone: 'pi pi-th-large',
       titulo: 'Categorias',
-      descricao: 'distros, dotfiles, troubleshooting e mais.',
+      descricao: 'Distros, dotfiles, troubleshooting e mais.',
     },
     {
       icone: 'pi pi-comments',
       titulo: 'Discussões diretas',
-      descricao: 'comentários simples, sem burocracia.',
+      descricao: 'Comentários simples, sem burocracia.',
     },
     {
       icone: 'pi pi-arrow-up',
       titulo: 'Upvotes',
-      descricao: 'o melhor conteúdo sobe pro topo.',
+      descricao: 'O melhor conteúdo sobe pro topo.',
     },
   ];
 }
