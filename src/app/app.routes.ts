@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login';
 import { InicioComponent } from './pages/inicio/inicio';
 import { CadastroComponent } from './pages/cadastro/cadastro';
+import { FeedComponent } from './pages/feed/feed';
 
 export const routes: Routes = [
   {
@@ -20,5 +21,9 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+  {
+    path: 'feed',
+    component: FeedComponent
   }
 ];

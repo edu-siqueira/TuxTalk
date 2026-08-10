@@ -1,0 +1,27 @@
+<div class="feed-page">
+
+  <div class="categoria-filtros">
+    <button
+      *ngFor="let cat of categorias"
+      type="button"
+      class="filtro-chip"
+      [class.ativo]="categoriaAtiva === cat.slug"
+      (click)="selecionarCategoria(cat.slug)"
+    >
+      {{ cat.label }}
+    </button>
+  </div>
+
+  <div class="post-list">
+    <app-post-card
+      *ngFor="let post of posts"
+      [post]="post"
+      (upvote)="onUpvote($event)"
+    ></app-post-card>
+
+    <p class="estado-vazio" *ngIf="!carregando && posts.length === 0">
+      nenhum post encontrado nessa categoria ainda.
+    </p>
+  </div>
+
+</div>

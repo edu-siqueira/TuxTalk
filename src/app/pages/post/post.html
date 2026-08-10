@@ -1,0 +1,30 @@
+<article class="post-card" [routerLink]="['/posts', post.id]">
+  <div class="upvote-col">
+    <button
+      type="button"
+      class="upvote-btn"
+      [class.votado]="post.votadoPeloUsuario"
+      (click)="onUpvoteClick($event)"
+      [attr.aria-pressed]="post.votadoPeloUsuario"
+      aria-label="dar upvote neste post"
+    >
+      <i class="pi pi-arrow-up"></i>
+    </button>
+    <span class="score">{{ post.score }}</span>
+  </div>
+
+  <div class="post-content">
+    <p class="post-title">{{ post.titulo }}</p>
+    <p class="post-resumo">{{ post.resumo }}</p>
+    <div class="post-meta">
+      <span class="categoria-badge">{{ post.categoria }}</span>
+      <span>u/{{ post.autor }}</span>
+      <span class="separador">·</span>
+      <span>{{ post.criadoEm | date: 'short' }}</span>
+      <span class="comentarios">
+        <i class="pi pi-comments"></i>
+        {{ post.totalComentarios }}
+      </span>
+    </div>
+  </div>
+</article>
