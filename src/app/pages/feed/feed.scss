@@ -5,6 +5,8 @@
   --tux-text-muted: #8b8f97;
   --tux-primary: #f2a623;
   --tux-primary-text: #412402;
+  --tux-font: 'Iosevka';
+  --tux-font-heading: 'Iosevka-Mono';
 
   display: block;
 }
@@ -17,29 +19,34 @@
 
 .categoria-filtros {
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  gap: 1.5rem;
   overflow-x: auto;
   padding-bottom: 1rem;
   margin-bottom: 0.25rem;
   border-bottom: 1px solid var(--tux-border-subtle);
 }
 
-.filtro-chip {
-  background: var(--tux-surface);
-  border: 1px solid var(--tux-border);
-  color: var(--tux-text-muted);
-  font-size: 12px;
-  font-family: 'Iosevka Charon Mono', monospace;
+:host ::ng-deep .filtro-chip {
+  color: var(--tux-primary);
+  background-color: var(--tux-surface);
+  border-color: var(--tux-primary);
+  font-size: 1rem;
+  font-family: var(--tux-font-heading), monospace;
   padding: 6px 12px;
-  border-radius: 999px;
   white-space: nowrap;
   cursor: pointer;
+}
 
-  &.ativo {
-    background: var(--tux-primary);
-    border-color: var(--tux-primary);
-    color: var(--tux-primary-text);
-  }
+:host ::ng-deep .filtro-chip:enabled:hover {
+  background-color: var(--tux-primary);
+  border-color: var(--tux-primary);
+}
+
+:host ::ng-deep .filtro-chip.ativo {
+  background: var(--tux-primary);
+  border-color: var(--tux-primary);
+  color: var(--tux-primary-text);
 }
 
 .post-list {
@@ -53,6 +60,6 @@
   text-align: center;
   color: var(--tux-text-muted);
   font-size: 13px;
-  font-family: sans-serif;
+  font-family: var(--tux-font);
   padding: 2rem 0;
 }

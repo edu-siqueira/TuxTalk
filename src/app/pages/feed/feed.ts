@@ -5,6 +5,8 @@ import { PostCardComponent } from '../post/post';
 import { PostService } from '../../services/Post.service';
 import { Post } from '../../models/Post';
 
+import { ButtonModule, Button } from 'primeng/button';
+
 interface CategoriaFiltro {
   slug: string | null; // null representa "todos"
   label: string;
@@ -13,7 +15,7 @@ interface CategoriaFiltro {
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [CommonModule, PostCardComponent],
+  imports: [CommonModule, PostCardComponent, ButtonModule, Button],
   templateUrl: './feed.html',
   styleUrls: ['./feed.scss'],
 })
