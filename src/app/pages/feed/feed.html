@@ -5,20 +5,31 @@
       *ngFor="let cat of categorias"
       [label]="cat.label"
       [rounded]="true"
-      [styleClass]="categoriaAtiva === cat.slug ? 'filtro-chip ativo' : 'filtro-chip'"
+      [styleClass]="categoriaAtiva() === cat.slug ? 'filtro-chip ativo' : 'filtro-chip'"
       (click)="selecionarCategoria(cat.slug)"
     >
     </p-button>
   </div>
 
+  <div class="logout">
+    <button
+      type="button"
+      class="logout-btn"
+      (click)="logout()"
+      aria-label="Sair da conta"
+    >
+      Sair <i class="pi pi-sign-out"></i>
+    </button>
+  </div>
+
   <div class="post-list">
     <app-post-card
-      *ngFor="let post of posts"
+      *ngFor="let post of posts()"
       [post]="post"
       (upvote)="onUpvote($event)"
     ></app-post-card>
 
-    @if (posts.length === 0) {
+    @if (posts().length === 0) {
       <p class="estado-vazio">
         Nenhum post foi encontrado nessa categoria ainda.
       </p>

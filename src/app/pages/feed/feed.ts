@@ -1,5 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { PostCardComponent } from '../post/post';
 import { PostService } from '../../services/Post.service';
@@ -21,6 +22,7 @@ interface CategoriaFiltro {
 })
 export class FeedComponent implements OnInit {
   private readonly postService = inject(PostService);
+  private readonly router = inject(Router);
 
   // Seed fixo, sem CRUD de categoria
   readonly categorias: CategoriaFiltro[] = [
@@ -31,51 +33,57 @@ export class FeedComponent implements OnInit {
     { slug: 'troubleshooting', label: 'Troubleshooting' },
   ];
 
-  categoriaAtiva: string | null = null;
-  posts: Post[] = [];
-  carregando = false;
+  categoriaAtiva = signal<string | null>(null);
+  posts = signal<Post[]>([]);
+  carregando = signal(false);
 
   ngOnInit(): void {
     this.carregarPosts();
   }
 
+  logout(): void {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
+  }
+
   selecionarCategoria(slug: string | null): void {
-    if (slug === this.categoriaAtiva) {
+    if (slug === this.categoriaAtiva()) {
       return;
     }
-    this.categoriaAtiva = slug;
+    this.categoriaAtiva.set(slug);
     this.carregarPosts();
   }
 
   onUpvote(postId: number): void {
-    // Atualização otimista: reflete a mudança na UI antes da resposta do backend
-    // chegar, pra dar sensação de resposta instantânea no clique.
-    const post = this.posts.find((p) => p.id === postId);
+    const post = this.posts().find((p) => p.id === postId);
     if (!post) {
       return;
     }
     const votadoAnterior = post.votadoPeloUsuario;
-    post.votadoPeloUsuario = !votadoAnterior;
-    post.score += votadoAnterior ? -1 : 1;
+    const delta = votadoAnterior ? -1 : 1;
+
+    this.atualizarPost(postId, { votadoPeloUsuario: !votadoAnterior, score: post.score + delta });
 
     this.postService.alternarUpvote(postId).subscribe({
       error: () => {
-        // Reverte em caso de falha na chamada
-        post.votadoPeloUsuario = votadoAnterior;
-        post.score += votadoAnterior ? 1 : -1;
+        this.atualizarPost(postId, { votadoPeloUsuario: votadoAnterior, score: post.score });
       },
     });
   }
 
+  private atualizarPost(postId: number, mudancas: Partial<Post>): void {
+    this.posts.update((lista) => lista.map((p) => (p.id === postId ? { ...p, ...mudancas } : p)));
+  }
+
   private carregarPosts(): void {
-    this.carregando = true;
-    this.postService.listar(this.categoriaAtiva ?? undefined).subscribe({
+    this.carregando.set(true);
+    this.postService.listar(this.categoriaAtiva() ?? undefined).subscribe({
       next: (posts) => {
-        this.posts = posts;
-        this.carregando = false;
+        this.posts.set(posts);
+        this.carregando.set(false);
       },
       error: () => {
-        this.carregando = false;
+        this.carregando.set(false);
       },
     });
   }

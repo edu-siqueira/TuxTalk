@@ -49,6 +49,27 @@
   color: var(--tux-primary-text);
 }
 
+:host ::ng-deep .logout {
+  position: absolute;
+  top: 1.5rem;
+  right: 1rem;
+  background-color: var(--tux-surface);
+  color: var(--tux-primary);
+  border: 1px solid var(--tux-primary);
+  border-radius: 100px;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+}
+
+:host ::ng-deep .logout .logout-btn {
+  background-color: transparent;
+  color: var(--tux-primary);
+  border: none;
+  font-family: var(--tux-font-heading);
+  padding: 0.2rem;
+  cursor: pointer;
+}
+
 .post-list {
   display: flex;
   flex-direction: column;
