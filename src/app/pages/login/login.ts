@@ -86,6 +86,10 @@ export class LoginComponent {
     });
   }
 
+  onLoginGoogle(): void {
+    this.authService.redirecionarParaGoogle();
+  }
+
   onLoginGithub(): void {
     this.authService.redirecionarParaGithub();
   }

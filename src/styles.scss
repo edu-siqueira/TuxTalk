@@ -1,5 +1,40 @@
+:root {
+  --tux-bg: #0f1115;
+  --tux-surface: #1c2027;
+  --tux-border: #3a4049;
+  --tux-border-subtle: #2a2f38;
+  --tux-text: #f5f4ef;
+  --tux-text-muted: #8b8f97;
+  --tux-primary: #f2a623;
+  --tux-primary-text: #412402;
+  --tux-accent: #5dcaa5;
+  --tux-danger: #e24b4a;
+  --tux-font: 'Iosevka';
+  --tux-font-heading: 'Iosevka-Mono';
+}
+
 body {
-  background-color: #0f1115;
+  margin: 0;
+  background-color: var(--tux-bg);
+}
+
+// Autofill do navegador: o Chrome pinta o fundo do input por conta própria e não dá
+// para sobrescrever com `background`. O truque é cobrir com um box-shadow inset
+// e atrasar a transição do background para nunca terminar.
+.p-inputtext:-webkit-autofill,
+.p-inputtext:-webkit-autofill:hover,
+.p-inputtext:-webkit-autofill:focus,
+.p-inputtext:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--tux-text-muted);
+  caret-color: var(--tux-bg);
+  box-shadow: 0 0 0 1000px var(--tux-bg) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+// Firefox usa :autofill (sem prefixo) e não aceita :-webkit-autofill, por isso a regra é separada.
+.p-inputtext:autofill {
+  box-shadow: 0 0 0 1000px var(--tux-bg) inset;
+  -webkit-text-fill-color: var(--tux-text-muted);
 }
 
 @import "primeicons/primeicons.css";

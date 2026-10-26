@@ -15,7 +15,7 @@
     ></p-message>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-      <div class="field">
+      <div class="field" [class.field-invalid]="identificador.invalid && identificador.touched">
         <label for="identificador">Usuário ou e-mail</label>
         <input
           id="identificador"
@@ -30,7 +30,7 @@
         </small>
       </div>
 
-      <div class="field">
+      <div class="field" [class.field-invalid]="senha.invalid && senha.touched">
         <label for="senha">Senha</label>
         <p-password
           inputId="senha"
@@ -64,23 +64,25 @@
       <span class="divider-text">Ou</span>
     </p-divider>
 
-    <button
-      pButton
-      type="button"
-      label="Continuar com Google"
-      icon="pi pi-google"
-      class="login-google w-full"
-      (click)="onLoginGithub()"
-    ></button>
+    <div class="login-social">
+      <button
+        pButton
+        type="button"
+        label="Continuar com Google"
+        icon="pi pi-google"
+        class="login-google w-full"
+        (click)="onLoginGoogle()"
+      ></button>
 
-    <button
-      pButton
-      type="button"
-      label="Continuar com Github"
-      icon="pi pi-github"
-      class="login-github w-full"
-      (click)="onLoginGithub()"
-    ></button>
+      <button
+        pButton
+        type="button"
+        label="Continuar com Github"
+        icon="pi pi-github"
+        class="login-github w-full"
+        (click)="onLoginGithub()"
+      ></button>
+    </div>
 
     <p class="signup-hint">
       Novo por aqui? <a routerLink="/cadastro">Criar conta</a>

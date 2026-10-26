@@ -1,34 +1,24 @@
 :host {
-  --tux-bg: #0f1115;
-  --tux-surface: #1c2027;
-  --tux-border: #3a4049;
-  --tux-border-subtle: #2a2f38;
-  --tux-text: #f5f4ef;
-  --tux-text-muted: #8b8f97;
-  --tux-primary: #f2a623;
-  --tux-primary-text: #412402;
-  --tux-accent: #5dcaa5;
-
   display: block;
 }
 
 .register-page {
-  font-family: 'Iosevka';
+  font-family: var(--tux-font);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--tux-bg);
-  padding: 2rem 1rem;
+  padding: 1rem;
 }
 
 .register-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 450px;
   background: var(--tux-surface);
   border: 1px solid var(--tux-border-subtle);
   border-radius: 12px;
-  padding: 2rem 1.75rem;
+  padding: 1.5rem 1.75rem;
 }
 
 .register-header {
@@ -36,35 +26,48 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 
   .register-logo {
-    width: 5rem;
-    height: 5rem;
+    width: 4rem;
+    height: 4rem;
   }
 
   .register-title {
     font-size: 35px;
     font-weight: 500;
-    font-family: 'Iosevka-Mono';
+    font-family: var(--tux-font-heading);
     color: var(--tux-text);
     margin: 0;
   }
 
   .register-subtitle {
     font-size: 13px;
-    font-family: 'Iosevka-Mono';
+    font-family: var(--tux-font);
     color: var(--tux-text-muted);
     margin: 0;
   }
 }
 
 .field {
-  margin-bottom: 14px;
+  margin-bottom: 0.75rem;
   background-color: var(--tux-bg);
   color: var(--tux-text-muted);
   padding: 0.5rem;
   border-radius: 10px;
+  // Contorno via box-shadow (e não border) para não existir nada visível em repouso
+  // nem deslocar o layout.
+  box-shadow: 0 0 0 1px transparent;
+  transition: box-shadow 0.2s ease-in-out;
+
+  &:focus-within {
+    box-shadow: 0 0 0 1px var(--tux-accent);
+  }
+
+  // Depois do :focus-within de propósito: erro vence o foco.
+  &.field-invalid {
+    box-shadow: 0 0 0 1px var(--tux-danger);
+  }
 
   label {
     display: block;
@@ -74,9 +77,25 @@
 
   .field-error {
     display: block;
-    color: #e24b4a;
+    color: var(--tux-danger);
     font-size: 12px;
     margin-top: 4px;
+  }
+}
+
+// Senha e confirmação lado a lado para economizar altura; empilha em telas estreitas.
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+
+  .field {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -84,13 +103,13 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-bottom: 18px;
-  font-size: 12px;
+  margin-bottom: 1rem;
+  font-size: 13px;
   color: var(--tux-text-muted);
   cursor: pointer;
 
   a {
-    color: var(--tux-accent);
+    color: var(--tux-primary);
     text-decoration: none;
 
     &:hover {
@@ -103,7 +122,7 @@
   text-align: center;
   font-size: 13px;
   color: var(--tux-text-muted);
-  margin: 1.5rem 0 0;
+  margin: 1rem 0 0;
 
   a {
     color: var(--tux-accent);
@@ -115,65 +134,71 @@
   }
 }
 
-.divider-text {
-  font-size: auto;
-  color: var(--tux-text-muted);
-  background-color: var(--tux-surface);
-  padding: 0 0.5rem;
-}
-
 .w-full {
   width: 100%;
 }
 
-// Mesmo padrão de overrides pontuais do LoginComponent — candidato a virar
-// um preset de tema PrimeNG compartilhado entre as telas de auth.
+// Cores, padding e foco dos campos e do checkbox vêm do preset (src/app/theme/tux-preset.ts).
+// Aqui fica só layout.
 :host ::ng-deep {
-  input.p-inputtext,
-  .p-password input {
-    background: var(--tux-bg);
-    color: var(--tux-text-muted);
-    border-radius: 8px;
+  p-password,
+  .p-password {
+    display: block;
+    width: 100%;
   }
 
-  .p-checkbox .p-checkbox-box {
-    background: var(--tux-bg);
-    border-color: var(--tux-border);
-
-    &.p-highlight {
-      background: var(--tux-primary);
-      border-color: var(--tux-primary);
-    }
+  .p-password .p-inputtext {
+    width: 100%;
   }
+}
 
-  .register-submit {
-    background-color: var(--tux-primary);
-    border: 1px solid var(--tux-border);
-    color: var(--tux-bg);
-    font-weight: 800;
-    height: 2.5rem;
-    border-radius: 8px;
-    justify-content: center;
-    gap: 8px;
+.register-submit {
+  background-color: var(--tux-surface);
+  border: 1px solid var(--tux-border);
+  color: var(--tux-primary);
+  font-weight: 800;
+  height: 2.5rem;
+  border-radius: 8px;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.4s ease-in-out;
 
-    &:not(:disabled):hover {
-      background: color-mix(in srgb, var(--tux-primary) 90%, black);
-    }
+  &:not(:disabled):hover {
+    background: var(--tux-surface);
+    border-color: var(--tux-primary);
+    color: var(--tux-primary);
   }
+}
 
-  .register-oauth {
-    background: transparent;
-    border: 1px solid var(--tux-border);
+.register-social {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.register-oauth {
+  background: var(--tux-surface);
+  border: 1px solid var(--tux-border);
+  color: var(--tux-text);
+  height: 2.5rem;
+  border-radius: 8px;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.5s ease-in-out;
+
+  &:not(:disabled):hover {
+    border: 1px solid var(--tux-text);
+    background: var(--tux-surface);
     color: var(--tux-text);
-    height: 36px;
-    border-radius: 8px;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 10px;
+  }
+}
 
-    &:not(:disabled):hover {
-      background: var(--tux-border-subtle);
-    }
+// Elementos gerados internamente pelo PrimeNG (não recebem o atributo de escopo do componente).
+:host ::ng-deep {
+  .register-oauth .p-button-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
   }
 
   .register-error {
@@ -182,30 +207,11 @@
   }
 
   .p-divider.p-divider-horizontal {
-    margin: 1.5rem 0;
+    margin: 1rem 0;
+    padding: 0 5rem;
 
     &:before {
       border-top-color: var(--tux-border-subtle);
     }
   }
-
-  .p-password-toggle-mask,
-    .p-icon-field-right > i,
-    svg {
-      position: absolute !important;
-      right: 0.5rem !important;
-      top: 50% !important;
-      transform: translateY(-50%) !important;
-      left: auto !important; // Evita que fique colado na esquerda
-      cursor: pointer;
-      color: var(--tux-text-muted);
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &:hover {
-        color: var(--tux-text);
-      }
-    }
 }

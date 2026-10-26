@@ -2,7 +2,7 @@
   <div class="register-card" data-aos="fade-right">
 
     <div class="register-header">
-      <img class='register-logo' src="tuxtalk-icon.png" alt="logo-tuxtalk" srcset="">
+      <img class='register-logo' src="tuxtalk-icon.png" alt="logo-tuxtalk">
       <p class="register-title">Criar conta</p>
       <p class="register-subtitle">Bem-vindo ao tuxtalk</p>
     </div>
@@ -15,7 +15,7 @@
     ></p-message>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-      <div class="field">
+      <div class="field" [class.field-invalid]="username.invalid && username.touched">
         <label for="username">Nome de usuário</label>
         <input
           id="username"
@@ -30,7 +30,7 @@
         </small>
       </div>
 
-      <div class="field">
+      <div class="field" [class.field-invalid]="email.invalid && email.touched">
         <label for="email">E-mail</label>
         <input
           id="email"
@@ -45,35 +45,36 @@
         </small>
       </div>
 
-      <div class="field">
-        <label for="senha">Senha</label>
-        <p-password
-          inputId="senha"
-          formControlName="senha"
-          [feedback]="false"
-          [toggleMask]="true"
-          placeholder="mínimo 8 caracteres"
-          styleClass="w-full"
-          inputStyleClass="w-full"
-        ></p-password>
-        <small class="field-error" *ngIf="senha.invalid && senha.touched">
-          A senha deve ter ao menos 8 caracteres.
-        </small>
-      </div>
+      <div class="field-row">
+        <div class="field" [class.field-invalid]="senha.invalid && senha.touched">
+          <label for="senha">Senha</label>
+          <p-password
+            inputId="senha"
+            formControlName="senha"
+            [feedback]="false"
+            [toggleMask]="true"
+            placeholder="mín. 8 caracteres"
+            class="w-full"
+          ></p-password>
+          <small class="field-error" *ngIf="senha.invalid && senha.touched">
+            Mínimo de 8 caracteres.
+          </small>
+        </div>
 
-      <div class="field">
-        <label for="confirmarSenha">Confirmar senha</label>
-        <p-password
-          inputId="confirmarSenha"
-          formControlName="confirmarSenha"
-          [feedback]="false"
-          [toggleMask]="true"
-          placeholder="repita a senha"
-          class="w-full"
-        ></p-password>
-        <small class="field-error" *ngIf="senhasDiferem">
-          As senhas não coincidem.
-        </small>
+        <div class="field" [class.field-invalid]="senhasDiferem">
+          <label for="confirmarSenha">Confirmar senha</label>
+          <p-password
+            inputId="confirmarSenha"
+            formControlName="confirmarSenha"
+            [feedback]="false"
+            [toggleMask]="true"
+            placeholder="repita a senha"
+            class="w-full"
+          ></p-password>
+          <small class="field-error" *ngIf="senhasDiferem">
+            As senhas não coincidem.
+          </small>
+        </div>
       </div>
 
       <label class="terms-check">
@@ -96,23 +97,25 @@
       <span class="divider-text">Ou</span>
     </p-divider>
 
-    <button
-      pButton
-      type="button"
-      label="Continuar com Google"
-      icon="pi pi-google"
-      class="register-oauth w-full"
-      (click)="onCadastroGoogle()"
-    ></button>
+    <div class="register-social">
+      <button
+        pButton
+        type="button"
+        label="Continuar com Google"
+        icon="pi pi-google"
+        class="register-oauth w-full"
+        (click)="onCadastroGoogle()"
+      ></button>
 
-    <button
-      pButton
-      type="button"
-      label="Continuar com Github"
-      icon="pi pi-github"
-      class="register-oauth w-full"
-      (click)="onCadastroGithub()"
-    ></button>
+      <button
+        pButton
+        type="button"
+        label="Continuar com Github"
+        icon="pi pi-github"
+        class="register-oauth w-full"
+        (click)="onCadastroGithub()"
+      ></button>
+    </div>
 
     <p class="login-hint">
       Já tem conta? <a routerLink="/login">Entrar</a>
