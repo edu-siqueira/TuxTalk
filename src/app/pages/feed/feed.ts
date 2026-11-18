@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { PostCardComponent } from '../post/post';
 import { PostService } from '../../services/Post.service';
+import { AuthService } from '../../services/Auth.service';
 import { Post } from '../../models/Post';
 
 import { ButtonModule, Button } from 'primeng/button';
@@ -23,6 +24,7 @@ interface CategoriaFiltro {
 export class FeedComponent implements OnInit {
   private readonly postService = inject(PostService);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   // Seed fixo, sem CRUD de categoria
   readonly categorias: CategoriaFiltro[] = [
@@ -42,7 +44,7 @@ export class FeedComponent implements OnInit {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 

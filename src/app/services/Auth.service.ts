@@ -12,6 +12,8 @@ interface CadastroPayload {
   senha: string;
 }
 
+export const TOKEN_STORAGE_KEY = 'tuxtalk_token';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -20,13 +22,17 @@ export class AuthService {
   login(identificador: string, senha: string): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>(`${this.apiUrl}/login`, { identificador, senha })
-      .pipe(tap((res) => localStorage.setItem('tuxtalk_token', res.token)));
+      .pipe(tap((res) => localStorage.setItem(TOKEN_STORAGE_KEY, res.token)));
   }
 
   registrar(payload: CadastroPayload): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>(`${this.apiUrl}/registrar`, payload)
-      .pipe(tap((res) => localStorage.setItem('tuxtalk_token', res.token)));
+      .pipe(tap((res) => localStorage.setItem(TOKEN_STORAGE_KEY, res.token)));
+  }
+
+  logout(): void {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
   }
 
   redirecionarParaGithub(): void {

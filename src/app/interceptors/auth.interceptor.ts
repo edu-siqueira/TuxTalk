@@ -1,7 +1,9 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
+import { TOKEN_STORAGE_KEY } from '../services/Auth.service';
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('tuxtalk_token');
+  const token = localStorage.getItem(TOKEN_STORAGE_KEY);
   if (!token) {
     return next(req);
   }

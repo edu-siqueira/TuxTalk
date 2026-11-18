@@ -16,7 +16,7 @@ interface Destaque {
   templateUrl: './inicio.html',
   styleUrls: ['./inicio.scss'],
 })
-export class InicioComponent {
+export class InicioComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     AOS.init({
