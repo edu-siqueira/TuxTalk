@@ -1,0 +1,82 @@
+:host {
+  display: block;
+}
+
+.janela {
+  // PROTÓTIPO VIDRO: o fundo sólido saiu daqui e foi para .janela-corpo, para a barra
+  // de título deixar o wallpaper aparecer. Para reverter: devolva `background: var(--tux-surface)` aqui.
+  background: transparent;
+  // Variáveis opcionais: quem hospeda a janela (ex.: post-card) pode destacá-la no hover
+  // sem ::ng-deep, pois custom properties herdam através do componente.
+  border: 1px solid var(--janela-borda, var(--tux-border));
+  border-radius: var(--tux-radius-md);
+  box-shadow: var(--janela-sombra, var(--tux-shadow-window));
+  transition:
+    border-color var(--tux-transition),
+    box-shadow var(--tux-transition);
+  overflow: hidden;
+  color: var(--tux-text);
+}
+
+.janela-barra {
+  display: flex;
+  align-items: center;
+  gap: var(--tux-space-3);
+  padding: var(--tux-space-2) var(--tux-space-3);
+  background: var(--tux-titlebar); // fallback original
+  // PROTÓTIPO VIDRO: só alfa, sem backdrop-filter. Cada janela da lista teria um blur
+  // caro durante a rolagem; sobre o wallpaper liso o blur nem se notaria.
+  background: var(--tux-glass-bg);
+  box-shadow: inset 0 1px 0 var(--tux-glass-border); // PROTÓTIPO VIDRO
+  border-bottom: 1px solid var(--tux-border-subtle);
+  min-width: 0;
+}
+
+.janela-titulo {
+  flex-shrink: 0;
+  max-width: 60%;
+  font-family: var(--tux-font-heading);
+  font-size: var(--tux-fs-sm);
+  font-weight: 500;
+  color: var(--tux-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.janela-prompt {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--tux-fs-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Sem o prompt, os controles continuam alinhados à direita.
+.janela-controles {
+  display: flex;
+  align-items: center;
+  gap: var(--tux-space-2);
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--tux-text-muted);
+  font-family: var(--tux-font);
+  font-size: var(--tux-fs-sm);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+.janela-controle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+}
+
+.janela-corpo {
+  background: var(--tux-surface); // fallback sólido
+  background: var(--tux-glass-surface); // PROTÓTIPO VIDRO: 93% opaco, sem backdrop-filter (legibilidade validada)
+  padding: var(--tux-space-4);
+}

@@ -1,9 +1,31 @@
 import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 
-// Campos de formulário do TuxTalk: fundo escuro, sem borda própria e sem anel de foco.
+// Seletor do modo escuro do PrimeNG. Deve ser repassado em app.config.ts:
+//   providePrimeNG({ theme: { preset: TuxPreset, options: { darkModeSelector: TUX_DARK_MODE_SELECTOR } } })
+// O TemaService define `data-theme` ("dark" | "light") no <html>.
+export const TUX_DARK_MODE_SELECTOR = '[data-theme="dark"]';
+
+// Paleta azul (Breeze) derivada de #3daee9, que é o `--tux-primary` do tema escuro.
+// O 700 é o `--tux-primary` do tema claro (#1a699b).
+const primaryPalette = {
+  50: '#edf7fd',
+  100: '#d6eefa',
+  200: '#adddf6',
+  300: '#76c6ef',
+  400: '#3daee9',
+  500: '#1999dc',
+  600: '#1686c0',
+  700: '#1a699b',
+  800: '#0f5c85',
+  900: '#0b4665',
+  950: '#072d40',
+};
+
+// Campos de formulário do TuxTalk: fundo da "view", sem borda própria e sem anel de foco.
 // Borda/foco/erro ficam a cargo do wrapper `.field` de cada tela (ver login.scss).
-// Os valores vêm das variáveis --tux-* definidas em styles.scss.
+// Os valores vêm das variáveis --tux-* definidas em styles.scss, que já mudam com o tema
+// (`[data-theme="light"]`), então o mesmo objeto serve para os dois esquemas.
 const formFieldColors = {
   background: 'var(--tux-bg)',
   disabledBackground: 'var(--tux-bg)',
@@ -22,12 +44,21 @@ const formFieldColors = {
   shadow: 'none',
 };
 
+// Cor primária de ação: os tokens do tema (escuro/claro) em vez de um tom fixo da paleta.
+const primaryColors = {
+  color: 'var(--tux-primary)',
+  contrastColor: 'var(--tux-primary-text)',
+  hoverColor: 'var(--tux-primary)',
+  activeColor: 'var(--tux-primary)',
+};
+
 export const TuxPreset = definePreset(Aura, {
   semantic: {
+    primary: primaryPalette,
     formField: {
       paddingX: '0.5rem',
       paddingY: '0.5rem',
-      borderRadius: '8px',
+      borderRadius: 'var(--tux-radius-lg)',
       focusRing: {
         width: '0',
         style: 'none',
@@ -37,16 +68,17 @@ export const TuxPreset = definePreset(Aura, {
       },
     },
     colorScheme: {
-      light: { formField: formFieldColors },
-      dark: { formField: formFieldColors },
+      light: { primary: primaryColors, formField: formFieldColors },
+      dark: { primary: primaryColors, formField: formFieldColors },
     },
   },
   components: {
     checkbox: {
       root: {
+        borderRadius: 'var(--tux-radius-sm)',
         borderColor: 'var(--tux-border)',
         hoverBorderColor: 'var(--tux-text-muted)',
-        focusBorderColor: 'var(--tux-border)',
+        focusBorderColor: 'var(--tux-primary)',
         checkedBackground: 'var(--tux-primary)',
         checkedHoverBackground: 'var(--tux-primary)',
         checkedBorderColor: 'var(--tux-primary)',

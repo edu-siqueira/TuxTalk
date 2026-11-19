@@ -1,0 +1,51 @@
+<nav class="painel" aria-label="Navegação principal">
+  <a class="painel-lancador" [routerLink]="destinoMarca()" aria-label="TuxTalk, página principal">
+    <img class="painel-logo" src="tuxtalk-icon-128.png" alt="" width="28" height="28" />
+    <span class="painel-marca">TuxTalk</span>
+  </a>
+
+  <div class="painel-tarefas">
+    <a
+      class="painel-item"
+      routerLink="/inicio"
+      routerLinkActive="ativo"
+      ariaCurrentWhenActive="page"
+      aria-label="Início"
+    >
+      <i class="pi pi-home" aria-hidden="true"></i>
+      <span class="painel-rotulo">Início</span>
+    </a>
+    <a
+      class="painel-item"
+      routerLink="/feed"
+      routerLinkActive="ativo"
+      ariaCurrentWhenActive="page"
+      aria-label="Feed"
+    >
+      <i class="pi pi-comments" aria-hidden="true"></i>
+      <span class="painel-rotulo">Feed</span>
+    </a>
+  </div>
+
+  <div class="painel-bandeja">
+    <button
+      type="button"
+      class="painel-item painel-tema"
+      aria-label="Usar tema claro"
+      [attr.aria-pressed]="temaClaro()"
+      (click)="alternarTema()"
+    >
+      <i [class]="temaClaro() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
+    </button>
+
+    @if (estaLogado()) {
+      <button type="button" class="painel-item painel-sair" aria-label="Sair da conta" (click)="aoSair()">
+        <span class="painel-sair-rotulo">Sair</span>
+        <i class="pi pi-sign-out" aria-hidden="true"></i>
+      </button>
+    } @else {
+      <a class="painel-item painel-entrar" routerLink="/login">Entrar</a>
+      <a class="painel-item painel-criar" routerLink="/cadastro">Criar conta</a>
+    }
+  </div>
+</nav>

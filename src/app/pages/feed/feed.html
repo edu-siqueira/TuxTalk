@@ -1,40 +1,120 @@
-<div class="feed-page">
+<app-painel (sair)="logout()" />
 
-  <div class="categoria-filtros">
-    <p-button
-      *ngFor="let cat of categorias"
-      [label]="cat.label"
-      [rounded]="true"
-      [styleClass]="categoriaAtiva() === cat.slug ? 'filtro-chip ativo' : 'filtro-chip'"
-      (click)="selecionarCategoria(cat.slug)"
-    >
-    </p-button>
-  </div>
+<div class="feed-page" [class.sidebar-recolhida]="trilho()" [class.animavel]="animar()">
+  @if (ehMobile() && gavetaAberta()) {
+    <div class="gaveta-backdrop" aria-hidden="true" (click)="fecharGaveta()"></div>
+  }
 
-  <div class="logout">
-    <button
-      type="button"
-      class="logout-btn"
-      (click)="logout()"
-      aria-label="Sair da conta"
-    >
-      Sair <i class="pi pi-sign-out"></i>
-    </button>
-  </div>
+  <aside
+    #sidebar
+    id="feed-sidebar"
+    class="feed-sidebar"
+    [class.recolhida]="trilho()"
+    [class.gaveta]="ehMobile()"
+    [class.aberta]="ehMobile() && gavetaAberta()"
+    [attr.role]="ehMobile() ? 'dialog' : null"
+    [attr.aria-modal]="ehMobile() ? 'true' : null"
+    aria-label="Categorias"
+    (keydown.tab)="onTabNaGaveta($event)"
+  >
+    <div class="feed-sidebar-topo">
+      <h2 class="feed-sidebar-titulo" id="categorias-titulo">
+        <span class="tux-prompt" aria-hidden="true">$</span>
+        <span class="feed-sidebar-titulo-texto"> categorias</span>
+      </h2>
 
-  <div class="post-list">
-    <app-post-card
-      *ngFor="let post of posts()"
-      [post]="post"
-      (upvote)="onUpvote($event)"
-    ></app-post-card>
+      @if (ehMobile()) {
+        <button
+          type="button"
+          class="sidebar-botao"
+          aria-label="Fechar categorias"
+          (click)="fecharGaveta()"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="sidebar-botao"
+          [attr.aria-expanded]="!sidebarRecolhida()"
+          aria-controls="categoria-lista"
+          [attr.aria-label]="sidebarRecolhida() ? 'Expandir categorias' : 'Recolher categorias'"
+          (click)="alternarSidebar()"
+        >
+          <i
+            class="pi"
+            [class.pi-angle-double-left]="!sidebarRecolhida()"
+            [class.pi-angle-double-right]="sidebarRecolhida()"
+            aria-hidden="true"
+          ></i>
+        </button>
+      }
+    </div>
 
-    @if (posts().length === 0) {
-      <p class="estado-vazio">
-        Nenhum post foi encontrado nessa categoria ainda.
-      </p>
-    }
+    <ul class="categoria-lista" id="categoria-lista">
+      @for (cat of categorias; track cat.slug) {
+        <li>
+          <button
+            type="button"
+            class="categoria-item"
+            [class.ativo]="categoriaAtiva() === cat.slug"
+            [attr.aria-pressed]="categoriaAtiva() === cat.slug"
+            [attr.title]="trilho() ? cat.label : null"
+            (click)="escolherCategoria(cat.slug)"
+          >
+            <i class="pi categoria-icone" [class]="cat.icone" aria-hidden="true"></i>
+            <span class="categoria-rotulo">{{ cat.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </aside>
 
-  </div>
+  <section class="feed-conteudo" aria-labelledby="feed-titulo">
+    <header class="feed-cabecalho">
+      <h1 class="feed-titulo" id="feed-titulo">
+        <span class="tux-prompt feed-prompt">usuario&#64;tuxtalk:~/feed$</span>
+        <span class="feed-categoria-ativa">{{ rotuloCategoriaAtiva() }}</span>
+      </h1>
 
+      <button
+        #botaoGaveta
+        type="button"
+        class="categorias-botao-mobile"
+        aria-controls="feed-sidebar"
+        [attr.aria-expanded]="ehMobile() && gavetaAberta()"
+        (click)="abrirGaveta()"
+      >
+        <i class="pi pi-bars" aria-hidden="true"></i>
+        <span>Categorias</span>
+        <span class="categorias-botao-ativa">{{ rotuloCategoriaAtiva() }}</span>
+      </button>
+    </header>
+
+    <div class="post-list">
+      @if (!carregando()) {
+        @for (post of posts(); track post.id) {
+          <app-post-card [post]="post" (upvote)="onUpvote($event)"></app-post-card>
+        }
+      }
+
+      @if (carregando()) {
+        <p class="estado-carregando" role="status" aria-live="polite">
+          <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+          Carregando posts…
+        </p>
+      } @else if (erro()) {
+        <div class="estado-erro" role="alert">
+          <p>{{ erro() }}</p>
+          <button type="button" class="tentar-de-novo" (click)="carregarPosts()">
+            Tentar de novo
+          </button>
+        </div>
+      } @else if (posts().length === 0) {
+        <p class="estado-vazio">
+          Nenhum post foi encontrado nessa categoria ainda.
+        </p>
+      }
+    </div>
+  </section>
 </div>

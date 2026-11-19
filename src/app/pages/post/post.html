@@ -1,30 +1,33 @@
-<article class="post-card">
-  <div class="upvote-col">
-    <button
-      type="button"
-      class="upvote-btn"
-      [class.votado]="post.votadoPeloUsuario"
-      (click)="onUpvoteClick($event)"
-      [attr.aria-pressed]="post.votadoPeloUsuario"
-      aria-label="Votar neste post"
-    >
-      <i class="pi pi-arrow-up"></i>
-    </button>
-    <span class="score">{{ post.score }}</span>
-  </div>
-
-  <div class="post-content">
-    <p class="post-title">{{ post.titulo }}</p>
-    <p class="post-resumo">{{ post.resumo }}</p>
-    <div class="post-meta">
-      <span class="categoria-badge">{{ post.categoria }}</span>
-      <span>{{ post.autor }}</span>
-      <span class="separador">·</span>
-      <span>{{ post.criadoEm | date: 'short' }}</span>
-      <span class="comentarios">
-        <i class="pi pi-comments"></i>
-        {{ post.totalComentarios }}
-      </span>
+<app-janela [titulo]="'~/' + caminho()" [prompt]="post.autor + '@tuxtalk'">
+  <article class="post-card">
+    <div class="upvote-col">
+      <button
+        type="button"
+        class="upvote-btn"
+        [class.votado]="post.votadoPeloUsuario"
+        (click)="onUpvoteClick($event)"
+        [attr.aria-pressed]="post.votadoPeloUsuario"
+        aria-label="Votar neste post"
+      >
+        <span class="upvote-seta" aria-hidden="true">▲</span>
+        <span class="score">{{ post.score }}</span>
+      </button>
     </div>
-  </div>
-</article>
+
+    <div class="post-content">
+      <h2 class="post-title">{{ post.titulo }}</h2>
+      <p class="post-resumo">{{ post.resumo }}</p>
+      <div class="post-meta">
+        <span class="categoria-badge">{{ post.categoria }}</span>
+        <span class="post-autor tux-prompt">{{ post.autor }}</span>
+        <span class="separador" aria-hidden="true">·</span>
+        <time class="post-data" [attr.datetime]="post.criadoEm">{{ post.criadoEm | date: 'short' }}</time>
+        <span class="comentarios">
+          <i class="pi pi-comments" aria-hidden="true"></i>
+          <span class="visually-hidden">Comentários:</span>
+          {{ post.totalComentarios }}
+        </span>
+      </div>
+    </div>
+  </article>
+</app-janela>

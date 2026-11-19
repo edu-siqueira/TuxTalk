@@ -1,0 +1,137 @@
+:host {
+  display: block;
+  // PROTÓTIPO VIDRO: painel fixo no topo para o blur mostrar o conteúdo rolando por baixo.
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.painel {
+  display: flex;
+  align-items: center;
+  gap: var(--tux-space-3);
+  box-sizing: border-box;
+  height: var(--tux-painel-altura);
+  padding: var(--tux-space-1) var(--tux-space-3);
+  background: var(--tux-titlebar); // fallback original
+  background: var(--tux-glass-bg); // PROTÓTIPO VIDRO
+  -webkit-backdrop-filter: var(--tux-blur); // PROTÓTIPO VIDRO
+  backdrop-filter: var(--tux-blur); // PROTÓTIPO VIDRO
+  border-bottom: 1px solid var(--tux-border-subtle);
+  box-shadow: inset 0 -1px 0 var(--tux-glass-border); // PROTÓTIPO VIDRO
+  font-family: var(--tux-font-heading);
+}
+
+.painel-lancador {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tux-space-2);
+  min-height: 2.5rem;
+  padding: 0 var(--tux-space-2);
+  border-radius: var(--tux-radius-sm);
+  color: var(--tux-text);
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background var(--tux-transition);
+
+  &:hover {
+    background: var(--tux-surface);
+  }
+}
+
+.painel-logo {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+}
+
+.painel-marca {
+  font-size: var(--tux-fs-lg);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.painel-tarefas {
+  display: flex;
+  align-items: center;
+  gap: var(--tux-space-1);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.painel-bandeja {
+  display: flex;
+  align-items: center;
+  gap: var(--tux-space-1);
+  flex-shrink: 0;
+}
+
+// Item comum a links e botões do painel: alvo de toque >= 2.5rem, texto numa linha só.
+.painel-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tux-space-2);
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 var(--tux-space-3);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: var(--tux-radius-sm);
+  background: transparent;
+  color: var(--tux-text-muted);
+  font-family: inherit;
+  font-size: var(--tux-fs-sm);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--tux-transition),
+    color var(--tux-transition);
+
+  &:hover {
+    background: var(--tux-surface);
+    color: var(--tux-text);
+  }
+
+  // Tarefa ativa do Plasma: fundo azul translúcido + indicador azul embaixo.
+  &.ativo {
+    background: color-mix(in srgb, var(--tux-primary) 16%, transparent);
+    border-bottom-color: var(--tux-primary);
+    color: var(--tux-text);
+  }
+}
+
+.painel-criar {
+  background: var(--tux-primary);
+  color: var(--tux-primary-text);
+  font-weight: 500;
+
+  &:hover {
+    background: var(--tux-primary);
+    color: var(--tux-primary-text);
+    opacity: 0.9;
+  }
+}
+
+.painel-sair:hover {
+  color: var(--tux-danger);
+}
+
+// Telas estreitas: os itens de tarefa ficam só com o ícone (o aria-label cobre o nome)
+// e a marca vira só o logo, para nenhum rótulo quebrar em duas linhas.
+@media (max-width: 480px) {
+  .painel {
+    gap: var(--tux-space-1);
+    padding: var(--tux-space-1) var(--tux-space-2);
+  }
+
+  .painel-marca,
+  .painel-rotulo {
+    display: none;
+  }
+
+  .painel-item {
+    padding: 0 var(--tux-space-2);
+  }
+}

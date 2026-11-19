@@ -16,4 +16,13 @@ describe('App', () => {
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
+
+  it('aplica data-theme no <html> já ao criar o app', () => {
+    delete document.documentElement.dataset['theme'];
+
+    TestBed.createComponent(App);
+
+    expect(['light', 'dark']).toContain(document.documentElement.dataset['theme']);
+    delete document.documentElement.dataset['theme'];
+  });
 });

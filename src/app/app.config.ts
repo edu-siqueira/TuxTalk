@@ -5,7 +5,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
-import { TuxPreset } from './theme/tux-preset';
+import { TuxPreset, TUX_DARK_MODE_SELECTOR } from './theme/tux-preset';
 import { authInterceptor } from './interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
@@ -15,7 +15,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     providePrimeNG({
             theme: {
-                preset: TuxPreset
+                preset: TuxPreset,
+                options: { darkModeSelector: TUX_DARK_MODE_SELECTOR }
             }
         })
   ]

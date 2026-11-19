@@ -2,51 +2,73 @@
   display: block;
 }
 
-.post-card {
-  background: var(--tux-surface);
-  border: 1px solid var(--tux-border-subtle);
-  border-radius: 12px;
-  padding: 1rem 1.1rem;
-  display: flex;
-  gap: 14px;
-  transition: border-color 0.15s ease;
+// Hover/foco discreto na janela: só borda azul suave e sombra um pouco mais forte.
+:host:hover,
+:host:focus-within {
+  --janela-borda: color-mix(in srgb, var(--tux-primary) 55%, var(--tux-border));
+}
 
-  &:hover {
-    border-color: var(--tux-border, #3a4049);
-  }
+.post-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tux-space-3);
 }
 
 .upvote-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-width: 32px;
 }
 
+// ▲ 12 empilhado: seta em cima, contagem embaixo, tudo dentro do botão (área de toque única).
 .upvote-btn {
-  background: transparent;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 2.5rem;
+  min-height: 2.75rem;
+  padding: var(--tux-space-1) var(--tux-space-2);
+  // O fundo (e não só a borda, de baixo contraste) delimita o controle.
+  background: color-mix(in srgb, var(--tux-text) 7%, transparent);
+  border: 1px solid var(--tux-border-subtle);
+  border-radius: var(--tux-radius-sm);
   color: var(--tux-text-muted);
-  font-size: 18px;
-  line-height: 1;
-  border-radius: 6px;
+  font-family: var(--tux-font-heading), monospace;
+  cursor: pointer;
+  transition: background var(--tux-transition), color var(--tux-transition);
 
   &:hover {
-    background: var(--tux-border-subtle);
-  }
-
-  &.votado {
+    background: color-mix(in srgb, var(--tux-primary) 16%, transparent);
     color: var(--tux-primary);
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--tux-primary);
+    outline-offset: 2px;
+  }
+
+  // Votado: fundo azul, seta e número em azul + peso maior (não depende só da borda).
+  &.votado {
+    background: color-mix(in srgb, var(--tux-primary) 22%, transparent);
+    color: var(--tux-primary);
+    border-color: var(--tux-primary);
+
+    .score {
+      color: var(--tux-primary);
+      font-weight: 700;
+    }
+  }
+}
+
+.upvote-seta {
+  font-size: var(--tux-fs-sm);
+  line-height: 1;
 }
 
 .score {
   color: var(--tux-text);
-  font-size: 13px;
-  font-family: 'Iosevka Charon Mono', monospace;
+  font-size: var(--tux-fs-sm);
 }
 
 .post-content {
@@ -56,50 +78,70 @@
 
 .post-title {
   color: var(--tux-text);
-  font-size: 15px;
+  font-size: var(--tux-fs-xl);
+  line-height: 1.3;
   font-weight: 500;
-  font-family: 'Iosevka Charon Mono', monospace;
-  margin: 0 0 4px;
+  font-family: var(--tux-font-heading), monospace;
+  margin: 0 0 var(--tux-space-2);
+  overflow-wrap: anywhere;
 }
 
 .post-resumo {
   color: var(--tux-text-muted);
-  font-size: 13px;
-  font-family: sans-serif;
-  line-height: 1.5;
-  margin: 0 0 8px;
+  font-size: var(--tux-fs-md);
+  font-family: var(--tux-font);
+  line-height: 1.6;
+  margin: 0 0 var(--tux-space-3);
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .post-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  font-size: 12px;
+  gap: var(--tux-space-2);
+  font-size: var(--tux-fs-xs);
   color: var(--tux-text-muted);
-  font-family: sans-serif;
+  font-family: var(--tux-font);
 
   .categoria-badge {
-    background: var(--tux-border-subtle);
-    padding: 2px 8px;
-    border-radius: 999px;
+    color: var(--tux-accent);
+    background: color-mix(in srgb, var(--tux-accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tux-accent) 55%, transparent);
+    padding: 0 var(--tux-space-2);
+    border-radius: var(--tux-radius-sm);
   }
 
   .separador {
-    color: var(--tux-border-subtle);
+    color: var(--tux-text-muted);
   }
 
   .comentarios {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--tux-space-1);
     margin-left: auto;
-
-    i {
-      font-size: 14px;
-    }
   }
+}
+
+@media (max-width: 480px) {
+  .post-title {
+    font-size: var(--tux-fs-lg);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

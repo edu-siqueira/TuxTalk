@@ -1,0 +1,19 @@
+<section class="janela">
+  <header class="janela-barra">
+    <span class="janela-titulo">{{ titulo() }}</span>
+    @if (prompt()) {
+      <span class="janela-prompt tux-prompt">{{ prompt() }}</span>
+    }
+    @if (controles()) {
+      <span class="janela-controles" aria-hidden="true">
+        <span class="janela-controle">&#x2212;</span>
+        <span class="janela-controle">&#x25A1;</span>
+        <span class="janela-controle">&#x2715;</span>
+      </span>
+    }
+  </header>
+
+  <div class="janela-corpo">
+    <ng-content></ng-content>
+  </div>
+</section>
