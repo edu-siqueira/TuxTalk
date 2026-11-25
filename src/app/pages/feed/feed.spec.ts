@@ -4,9 +4,9 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { By } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 
-import { FeedComponent, SIDEBAR_RECOLHIDA_STORAGE_KEY } from './feed';
+import { FeedComponent, SIDEBAR_RECOLHIDA_STORAGE_KEY, lerNomeDoToken } from './feed';
 import { PainelComponent } from '../../components/painel/painel';
-import { AuthService } from '../../services/Auth.service';
+import { AuthService, TOKEN_STORAGE_KEY } from '../../services/Auth.service';
 import { Post } from '../../models/Post';
 
 describe('FeedComponent', () => {
@@ -454,5 +454,278 @@ describe('FeedComponent - sidebar colapsável', () => {
       expect(q('.feed-page')?.classList.contains('sidebar-recolhida')).toBe(false);
       expect(itens()[1].getAttribute('title')).toBeNull();
     });
+
+    it('gaveta aberta deixa painel e conteúdo inertes e trava a rolagem', async () => {
+      await criar(true);
+      expect(q('app-painel')?.hasAttribute('inert')).toBe(false);
+
+      botaoGaveta().click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(q('app-painel')?.hasAttribute('inert')).toBe(true);
+      expect(q('.feed-conteudo')?.hasAttribute('inert')).toBe(true);
+      expect(q('.feed-sidebar')?.hasAttribute('inert')).toBe(false);
+      expect(document.documentElement.classList.contains('tux-sem-rolagem')).toBe(true);
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(q('app-painel')?.hasAttribute('inert')).toBe(false);
+      expect(q('.feed-conteudo')?.hasAttribute('inert')).toBe(false);
+      expect(document.documentElement.classList.contains('tux-sem-rolagem')).toBe(false);
+    });
+
+    it('destruir o feed com a gaveta aberta libera a rolagem', async () => {
+      await criar(true);
+      botaoGaveta().click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.destroy();
+      expect(document.documentElement.classList.contains('tux-sem-rolagem')).toBe(false);
+    });
+  });
+
+  it('link "Pular para os posts" é o primeiro foco e leva o foco à lista', async () => {
+    await criar();
+    const pular = q('a.pular-conteudo') as HTMLAnchorElement;
+    expect(pular).toBeTruthy();
+    expect(raiz().querySelector('a, button')).toBe(pular);
+
+    pular.click();
+    expect(document.activeElement).toBe(q('#posts'));
+  });
+
+  it('o rótulo "$ categorias" não é heading (o h1 é o primeiro título da página)', async () => {
+    await criar();
+    expect(raiz().querySelector('h1, h2')?.tagName).toBe('H1');
+  });
+});
+
+describe('FeedComponent - textos', () => {
+  let fixture: ComponentFixture<FeedComponent>;
+  let http: HttpTestingController;
+
+  const q = (css: string): HTMLElement | null =>
+    (fixture.nativeElement as HTMLElement).querySelector(css);
+  const status = (): string =>
+    (fixture.nativeElement as HTMLElement)
+      .querySelector('.post-list > p.visually-hidden[role="status"]')
+      ?.textContent?.trim() ?? '';
+
+  async function criar(token: string | null = null): Promise<void> {
+    localStorage.clear();
+    if (token) {
+      localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    }
+    await TestBed.configureTestingModule({
+      imports: [FeedComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
+    http = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(FeedComponent);
+    fixture.detectChanges();
+  }
+
+  beforeEach(() => {
+    http = undefined as unknown as HttpTestingController;
+  });
+
+  afterEach(() => {
+    http?.verify();
+    localStorage.clear();
+  });
+
+  it('mostra "visitante" no prompt sem login e esconde o prompt do leitor de tela', async () => {
+    await criar();
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+
+    const prompt = q('.feed-prompt');
+    expect(prompt?.textContent).toContain('visitante@tuxtalk:~/feed$');
+    expect(prompt?.getAttribute('aria-hidden')).toBe('true');
+    expect(q('#feed-titulo')?.textContent).toContain('Posts:');
+  });
+
+  it('mostra o nome do token no prompt quando logado', async () => {
+    const payload = btoa(JSON.stringify({ sub: 'linus' })).replace(/=+$/, '');
+    await criar(`cabecalho.${payload}.assinatura`);
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+
+    expect(q('.feed-prompt')?.textContent).toContain('linus@tuxtalk');
+  });
+
+  it('lerNomeDoToken cai para "usuario" com token ilegível', () => {
+    localStorage.setItem(TOKEN_STORAGE_KEY, 'nao-e-jwt');
+    expect(lerNomeDoToken()).toBe('usuario');
+    localStorage.clear();
+    expect(lerNomeDoToken()).toBe('visitante');
+  });
+
+  it('estado vazio numa categoria oferece ver todos os posts', async () => {
+    await criar();
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+    expect(q('.estado-vazio')?.textContent).toContain('Ainda não há posts por aqui.');
+    expect(q('.estado-vazio button')).toBeNull();
+
+    fixture.componentInstance.selecionarCategoria('dotfiles');
+    http.expectOne('/api/posts?categoria=dotfiles').flush([]);
+    fixture.detectChanges();
+
+    expect(q('.estado-vazio')?.textContent).toContain('Ainda não há posts em Dotfiles.');
+    (q('.estado-vazio button') as HTMLButtonElement).click();
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.categoriaAtiva()).toBeNull();
+  });
+
+  it('anuncia o resultado do filtro', async () => {
+    await criar();
+    expect(status()).toBe('');
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+    expect(status()).toBe('Nenhum post');
+
+    fixture.componentInstance.selecionarCategoria('distros');
+    fixture.detectChanges();
+    expect(status()).toBe('');
+    http.expectOne('/api/posts?categoria=distros').flush([
+      {
+        id: 1, titulo: 'A', resumo: 'r', categoria: 'distros', autor: 'tux',
+        criadoEm: '2026-01-01T00:00:00Z', score: 0, totalComentarios: 0, votadoPeloUsuario: false,
+      },
+    ]);
+    fixture.detectChanges();
+    expect(status()).toBe('1 post em Distros');
+  });
+
+  it('mensagem de erro não repete o botão', async () => {
+    await criar();
+    http.expectOne('/api/posts').flush('x', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+    expect(q('.estado-erro p')?.textContent?.trim()).toBe('Não foi possível carregar os posts.');
+  });
+});
+
+describe('FeedComponent - upvote', () => {
+  let fixture: ComponentFixture<FeedComponent>;
+  let http: HttpTestingController;
+
+  const post: Post = {
+    id: 7,
+    titulo: 'Arch ou Debian?',
+    resumo: 'Resumo',
+    categoria: 'distros',
+    autor: 'tux',
+    criadoEm: '2026-01-01T00:00:00Z',
+    score: 3,
+    totalComentarios: 0,
+    votadoPeloUsuario: false,
+  };
+
+  const q = (css: string): HTMLElement | null =>
+    (fixture.nativeElement as HTMLElement).querySelector(css);
+  const votar = (): void => {
+    (q('.upvote-btn') as HTMLButtonElement).click();
+    fixture.detectChanges();
+  };
+  const score = (): string => q('.upvote-btn .score')?.textContent?.trim() ?? '';
+
+  async function criar(logado: boolean): Promise<void> {
+    localStorage.clear();
+    if (logado) {
+      localStorage.setItem(TOKEN_STORAGE_KEY, 'token-de-teste');
+    }
+    await TestBed.configureTestingModule({
+      imports: [FeedComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
+    http = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(FeedComponent);
+    fixture.detectChanges();
+    http.expectOne('/api/posts').flush([{ ...post }]);
+    fixture.detectChanges();
+  }
+
+  afterEach(() => {
+    http.verify();
+    localStorage.clear();
+  });
+
+  it('visitante: não envia o voto, não mexe no score e convida a entrar', async () => {
+    await criar(false);
+    votar();
+
+    http.expectNone('/api/posts/7/upvote');
+    expect(score()).toBe('3');
+    const aviso = q('.voto-aviso');
+    expect(aviso?.getAttribute('role')).toBe('alert');
+    expect(aviso?.textContent).toContain('Entre na sua conta para votar.');
+    expect(q('.voto-aviso a[href="/login"]')).toBeTruthy();
+    expect(q('.voto-aviso a[href="/cadastro"]')).toBeTruthy();
+    expect(q('.upvote-btn')?.getAttribute('aria-describedby')).toBe(aviso?.id);
+  });
+
+  it('fechar o aviso remove a mensagem e a descrição do botão', async () => {
+    await criar(false);
+    votar();
+    (q('.voto-aviso-fechar') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(q('.voto-aviso')).toBeNull();
+    expect(q('.upvote-btn')?.getAttribute('aria-describedby')).toBeNull();
+  });
+
+  it('logado: aplica o voto otimista e adota a resposta do servidor', async () => {
+    await criar(true);
+    votar();
+    expect(score()).toBe('4');
+
+    http.expectOne('/api/posts/7/upvote').flush({ ...post, score: 5, votadoPeloUsuario: true });
+    fixture.detectChanges();
+
+    expect(score()).toBe('5');
+    expect(q('.upvote-btn')?.getAttribute('aria-pressed')).toBe('true');
+    expect(q('.voto-aviso')).toBeNull();
+  });
+
+  it('logado: ignora cliques repetidos enquanto o voto está pendente', async () => {
+    await criar(true);
+    votar();
+    votar();
+
+    http.expectOne('/api/posts/7/upvote').flush({ ...post, score: 4, votadoPeloUsuario: true });
+    fixture.detectChanges();
+    expect(score()).toBe('4');
+  });
+
+  it('sessão expirada (401): desfaz o voto e pede para entrar de novo', async () => {
+    await criar(true);
+    votar();
+    http
+      .expectOne('/api/posts/7/upvote')
+      .flush('não autorizado', { status: 401, statusText: 'Unauthorized' });
+    fixture.detectChanges();
+
+    expect(score()).toBe('3');
+    expect(q('.upvote-btn')?.getAttribute('aria-pressed')).toBe('false');
+    expect(q('.voto-aviso')?.textContent).toContain('Sua sessão expirou');
+    expect(q('.voto-aviso a[href="/login"]')).toBeTruthy();
+  });
+
+  it('falha de servidor: desfaz o voto e avisa sem pedir login', async () => {
+    await criar(true);
+    votar();
+    http.expectOne('/api/posts/7/upvote').flush('erro', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    expect(score()).toBe('3');
+    const aviso = q('.voto-aviso');
+    expect(aviso?.classList.contains('voto-aviso-erro')).toBe(true);
+    expect(aviso?.textContent).toContain('Não foi possível registrar seu voto');
+    expect(q('.voto-aviso a')).toBeNull();
   });
 });

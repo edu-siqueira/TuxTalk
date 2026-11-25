@@ -1,4 +1,6 @@
-<app-painel (sair)="logout()" />
+<a class="pular-conteudo" href="#posts" (click)="pularParaPosts($event)">Pular para os posts</a>
+
+<app-painel (sair)="logout()" [attr.inert]="gavetaModal() ? '' : null" />
 
 <div class="feed-page" [class.sidebar-recolhida]="trilho()" [class.animavel]="animar()">
   @if (ehMobile() && gavetaAberta()) {
@@ -18,10 +20,12 @@
     (keydown.tab)="onTabNaGaveta($event)"
   >
     <div class="feed-sidebar-topo">
-      <h2 class="feed-sidebar-titulo" id="categorias-titulo">
-        <span class="tux-prompt" aria-hidden="true">$</span>
+      <!-- Rótulo visual: o <aside> já se chama "Categorias" (aria-label), então não é heading
+           (evita um h2 antes do h1 da página). -->
+      <p class="feed-sidebar-titulo" aria-hidden="true">
+        <span class="tux-prompt">$</span>
         <span class="feed-sidebar-titulo-texto"> categorias</span>
-      </h2>
+      </p>
 
       @if (ehMobile()) {
         <button
@@ -70,10 +74,11 @@
     </ul>
   </aside>
 
-  <section class="feed-conteudo" aria-labelledby="feed-titulo">
+  <section class="feed-conteudo" aria-labelledby="feed-titulo" [attr.inert]="gavetaModal() ? '' : null">
     <header class="feed-cabecalho">
       <h1 class="feed-titulo" id="feed-titulo">
-        <span class="tux-prompt feed-prompt">usuario&#64;tuxtalk:~/feed$</span>
+        <span class="tux-prompt feed-prompt" aria-hidden="true">{{ nomeNoPrompt }}&#64;tuxtalk:~/feed$</span>
+        <span class="visually-hidden">Posts: </span>
         <span class="feed-categoria-ativa">{{ rotuloCategoriaAtiva() }}</span>
       </h1>
 
@@ -86,15 +91,20 @@
         (click)="abrirGaveta()"
       >
         <i class="pi pi-bars" aria-hidden="true"></i>
-        <span>Categorias</span>
+        <span>Categorias<span class="visually-hidden">:</span></span>
         <span class="categorias-botao-ativa">{{ rotuloCategoriaAtiva() }}</span>
       </button>
     </header>
 
-    <div class="post-list">
+    <div class="post-list" id="posts" tabindex="-1" #listaPosts>
       @if (!carregando()) {
         @for (post of posts(); track post.id) {
-          <app-post-card [post]="post" (upvote)="onUpvote($event)"></app-post-card>
+          <app-post-card
+            [post]="post"
+            [aviso]="avisoDoPost(post.id)"
+            (upvote)="onUpvote($event)"
+            (fecharAviso)="fecharAvisoVoto()"
+          ></app-post-card>
         }
       }
 
@@ -111,10 +121,18 @@
           </button>
         </div>
       } @else if (posts().length === 0) {
-        <p class="estado-vazio">
-          Nenhum post foi encontrado nessa categoria ainda.
-        </p>
+        <div class="estado-vazio">
+          <p>{{ textoVazio() }}</p>
+          @if (categoriaAtiva()) {
+            <button type="button" class="tentar-de-novo" (click)="escolherCategoria(null)">
+              Ver todos os posts
+            </button>
+          }
+        </div>
       }
+
+      <!-- Anuncia o resultado do filtro para leitores de tela (o "Carregando" some sozinho). -->
+      <p class="visually-hidden" role="status" aria-live="polite">{{ resumoResultados() }}</p>
     </div>
   </section>
 </div>

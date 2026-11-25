@@ -7,7 +7,8 @@
         [class.votado]="post.votadoPeloUsuario"
         (click)="onUpvoteClick($event)"
         [attr.aria-pressed]="post.votadoPeloUsuario"
-        aria-label="Votar neste post"
+        [attr.aria-describedby]="aviso ? avisoId : null"
+        [attr.aria-label]="rotuloVoto"
       >
         <span class="upvote-seta" aria-hidden="true">▲</span>
         <span class="score">{{ post.score }}</span>
@@ -21,13 +22,35 @@
         <span class="categoria-badge">{{ post.categoria }}</span>
         <span class="post-autor tux-prompt">{{ post.autor }}</span>
         <span class="separador" aria-hidden="true">·</span>
-        <time class="post-data" [attr.datetime]="post.criadoEm">{{ post.criadoEm | date: 'short' }}</time>
+        <time class="post-data" [attr.datetime]="post.criadoEm" [attr.title]="dataCompleta">{{ dataRelativa }}</time>
         <span class="comentarios">
           <i class="pi pi-comments" aria-hidden="true"></i>
-          <span class="visually-hidden">Comentários:</span>
-          {{ post.totalComentarios }}
+          <span aria-hidden="true">{{ post.totalComentarios }}</span>
+          <span class="visually-hidden">{{ rotuloComentarios }}</span>
         </span>
       </div>
+
+      @if (aviso) {
+        <div class="voto-aviso" [class.voto-aviso-erro]="!aviso.pedirLogin" [id]="avisoId" role="alert">
+          <i
+            class="pi voto-aviso-icone"
+            [class.pi-lock]="aviso.pedirLogin"
+            [class.pi-exclamation-circle]="!aviso.pedirLogin"
+            aria-hidden="true"
+          ></i>
+          <span class="voto-aviso-texto">{{ aviso.mensagem }}</span>
+          @if (aviso.pedirLogin) {
+            <span class="voto-aviso-acoes">
+              <a routerLink="/login">Entrar</a>
+              <span aria-hidden="true">·</span>
+              <a routerLink="/cadastro">Criar conta</a>
+            </span>
+          }
+          <button type="button" class="voto-aviso-fechar" aria-label="Fechar aviso" (click)="fecharAviso.emit()">
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
     </div>
   </article>
 </app-janela>

@@ -14,6 +14,32 @@
   border: 0;
 }
 
+// "Pular para os posts": invisível até receber foco pelo teclado; aparece por cima do painel.
+.pular-conteudo {
+  position: fixed;
+  top: var(--tux-space-2);
+  left: var(--tux-space-2);
+  z-index: 50;
+  padding: var(--tux-space-2) var(--tux-space-3);
+  background: var(--tux-primary);
+  color: var(--tux-primary-text);
+  border-radius: var(--tux-radius-sm);
+  font-family: var(--tux-font-heading), monospace;
+  font-size: var(--tux-fs-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--tux-space-4)));
+
+  &:focus-visible {
+    transform: none;
+  }
+}
+
+// Alvo do "pular": recebe foco programático sem anel de foco na lista inteira.
+.post-list:focus {
+  outline: none;
+}
+
 // Desktop: sidebar (categorias) à esquerda, conteúdo à direita.
 // A largura da coluna acompanha o estado da sidebar (expandida / trilho).
 .feed-page {
@@ -180,20 +206,29 @@
   margin-bottom: var(--tux-space-4);
 }
 
+// Título da página: prompt em mono (estrutura) + nome da categoria em sans, o maior
+// texto da tela, para a hierarquia não depender só de 4px de diferença.
 .feed-titulo {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--tux-space-2);
+  column-gap: var(--tux-space-2);
   margin: 0;
-  font-family: var(--tux-font-heading), monospace;
-  font-size: var(--tux-fs-lg);
-  font-weight: 500;
   color: var(--tux-text);
 }
 
 .feed-prompt {
+  font-family: var(--tux-font-heading);
   font-size: var(--tux-fs-sm);
+  font-weight: 500;
+}
+
+.feed-categoria-ativa {
+  font-family: var(--tux-font);
+  font-size: var(--tux-fs-2xl);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .post-list {
@@ -211,6 +246,17 @@
   font-family: var(--tux-font);
   padding: var(--tux-space-6) 0;
   margin: 0;
+}
+
+.estado-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--tux-space-3);
+
+  p {
+    margin: 0;
+  }
 }
 
 .estado-carregando i {
@@ -373,6 +419,14 @@
     transition:
       transform var(--tux-transition),
       visibility var(--tux-transition);
+  }
+
+  // Ao abrir, a gaveta fica visível no mesmo quadro (visibility sem atraso) para poder
+  // receber foco; ao fechar, continua esperando o slide terminar para sumir.
+  .feed-page.animavel .feed-sidebar.gaveta.aberta {
+    transition:
+      transform var(--tux-transition),
+      visibility 0s;
   }
 }
 

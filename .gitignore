@@ -39,6 +39,11 @@ testem.log
 /typings
 __screenshots__/
 
+# Documentos de design/produto (uso local)
+/DESIGN.md
+/PRODUCT.md
+/.impeccable/
+
 # System files
 .DS_Store
 Thumbs.db

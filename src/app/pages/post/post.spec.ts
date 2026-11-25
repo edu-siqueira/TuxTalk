@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 
-import { PostCardComponent } from './post';
+import { PostCardComponent, formatarDataRelativa } from './post';
 import { Post } from '../../models/Post';
 
 const postDeTeste: Post = {
@@ -70,5 +70,45 @@ describe('PostCardComponent', () => {
 
     expect(seletor('.upvote-btn')?.getAttribute('aria-pressed')).toBe('true');
     expect(seletor('.upvote-btn')?.classList.contains('votado')).toBe(true);
+  });
+
+  it('dá ao upvote um nome que identifica o post e a contagem', async () => {
+    expect(seletor('.upvote-btn')?.getAttribute('aria-label')).toBe('Votar em “Título de teste”, 3 votos');
+
+    fixture.componentRef.setInput('post', { ...postDeTeste, score: 1 });
+    await fixture.whenStable();
+    expect(seletor('.upvote-btn')?.getAttribute('aria-label')).toBe('Votar em “Título de teste”, 1 voto');
+  });
+
+  it('mostra a data em português, com a data completa no title', () => {
+    const tempo = seletor('time.post-data');
+    expect(tempo?.getAttribute('datetime')).toBe('2026-01-01T12:00:00Z');
+    expect(tempo?.getAttribute('title')).toContain('de janeiro de 2026');
+    expect(tempo?.textContent).not.toMatch(/AM|PM/);
+  });
+
+  it('anuncia os comentários com plural correto', async () => {
+    expect(seletor('.comentarios .visually-hidden')?.textContent).toBe('0 comentários');
+    fixture.componentRef.setInput('post', { ...postDeTeste, totalComentarios: 1 });
+    await fixture.whenStable();
+    expect(seletor('.comentarios .visually-hidden')?.textContent).toBe('1 comentário');
+  });
+});
+
+describe('formatarDataRelativa', () => {
+  const agora = new Date('2026-11-19T12:00:00Z').getTime();
+  const antes = (segundos: number): string => new Date(agora - segundos * 1000).toISOString();
+
+  it('formata intervalos em português', () => {
+    expect(formatarDataRelativa(antes(10), agora)).toBe('agora há pouco');
+    expect(formatarDataRelativa(antes(5 * 60), agora)).toBe('há 5 minutos');
+    expect(formatarDataRelativa(antes(3 * 3600), agora)).toBe('há 3 horas');
+    expect(formatarDataRelativa(antes(24 * 3600), agora)).toBe('ontem');
+    expect(formatarDataRelativa(antes(20 * 24 * 3600), agora)).toBe('há 2 semanas');
+    expect(formatarDataRelativa(antes(400 * 24 * 3600), agora)).toBe('ano passado');
+  });
+
+  it('devolve vazio para data inválida', () => {
+    expect(formatarDataRelativa('não é data', agora)).toBe('');
   });
 });

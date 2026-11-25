@@ -76,22 +76,25 @@
   min-width: 0; // permite o line-clamp funcionar dentro do flex item
 }
 
+// Conteúdo em Fira Sans; a mono fica no chrome (barra de título, upvote, badge).
 .post-title {
   color: var(--tux-text);
   font-size: var(--tux-fs-xl);
   line-height: 1.3;
   font-weight: 500;
-  font-family: var(--tux-font-heading), monospace;
-  margin: 0 0 var(--tux-space-2);
+  font-family: var(--tux-font);
+  margin: 0 0 var(--tux-space-1);
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .post-resumo {
   color: var(--tux-text-muted);
-  font-size: var(--tux-fs-md);
+  font-size: var(--tux-fs-lg);
   font-family: var(--tux-font);
-  line-height: 1.6;
+  line-height: 1.55;
   margin: 0 0 var(--tux-space-3);
+  text-wrap: pretty;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -104,11 +107,13 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--tux-space-2);
-  font-size: var(--tux-fs-xs);
+  font-size: var(--tux-fs-sm);
   color: var(--tux-text-muted);
   font-family: var(--tux-font);
 
   .categoria-badge {
+    font-family: var(--tux-font-heading);
+    font-size: var(--tux-fs-xs);
     color: var(--tux-accent);
     background: color-mix(in srgb, var(--tux-accent) 12%, transparent);
     border: 1px solid color-mix(in srgb, var(--tux-accent) 55%, transparent);
@@ -128,11 +133,79 @@
   }
 }
 
-@media (max-width: 480px) {
-  .post-title {
-    font-size: var(--tux-fs-lg);
+// Aviso do voto (visitante sem login, sessão expirada ou falha de rede).
+// Limite por borda inteira + tom de fundo + ícone à frente (sem faixa lateral).
+.voto-aviso {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--tux-space-2);
+  margin-top: var(--tux-space-3);
+  padding: 0 0 0 var(--tux-space-3);
+  background: color-mix(in srgb, var(--tux-text) 6%, transparent);
+  border: 1px solid var(--tux-border-subtle);
+  border-radius: var(--tux-radius-sm);
+  color: var(--tux-text);
+  font-family: var(--tux-font), monospace;
+  font-size: var(--tux-fs-sm);
+
+  a {
+    color: var(--tux-primary);
+    font-family: var(--tux-font-heading), monospace;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+
+    &:hover {
+      text-decoration-thickness: 2px;
+    }
   }
 }
+
+.voto-aviso-icone {
+  color: var(--tux-text-muted);
+  font-size: var(--tux-fs-sm);
+}
+
+.voto-aviso-erro .voto-aviso-icone {
+  color: var(--tux-danger);
+}
+
+.voto-aviso-texto {
+  min-width: 0;
+}
+
+.voto-aviso-acoes {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tux-space-2);
+  color: var(--tux-text-muted);
+}
+
+.voto-aviso-fechar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  border-radius: var(--tux-radius-sm);
+  color: var(--tux-text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--tux-text) 8%, transparent);
+    color: var(--tux-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tux-primary);
+    outline-offset: 2px;
+  }
+}
+
 
 .visually-hidden {
   position: absolute;
