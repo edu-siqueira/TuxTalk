@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { By } from '@angular/platform-browser';
+import { By, Title } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
 
 import { FeedComponent, SIDEBAR_RECOLHIDA_STORAGE_KEY, lerNomeDoToken } from './feed';
@@ -236,24 +236,34 @@ describe('FeedComponent - sidebar colapsável', () => {
   const botaoGaveta = (): HTMLButtonElement => q('.categorias-botao-mobile') as HTMLButtonElement;
 
   let aoMudarBreakpoint: ((e: { matches: boolean }) => void) | undefined;
+  let aoMudarToque: ((e: { matches: boolean }) => void) | undefined;
 
-  function simularMatchMedia(mobile: boolean): void {
+  // Responde por consulta: "(pointer: coarse)" é o ponteiro de toque; o resto é o breakpoint mobile.
+  function simularMatchMedia(mobile: boolean, toque = false): void {
     aoMudarBreakpoint = undefined;
+    aoMudarToque = undefined;
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
       writable: true,
-      value: () => ({
-        matches: mobile,
-        addEventListener: (_tipo: string, fn: (e: { matches: boolean }) => void) => {
-          aoMudarBreakpoint = fn;
-        },
-        removeEventListener: () => undefined,
-      }),
+      value: (consulta: string) => {
+        const ehToque = consulta.includes('pointer');
+        return {
+          matches: ehToque ? toque : mobile,
+          addEventListener: (_tipo: string, fn: (e: { matches: boolean }) => void) => {
+            if (ehToque) {
+              aoMudarToque = fn;
+            } else {
+              aoMudarBreakpoint = fn;
+            }
+          },
+          removeEventListener: () => undefined,
+        };
+      },
     });
   }
 
-  async function criar(mobile = false): Promise<void> {
-    simularMatchMedia(mobile);
+  async function criar(mobile = false, toque = false): Promise<void> {
+    simularMatchMedia(mobile, toque);
     await TestBed.configureTestingModule({
       imports: [FeedComponent],
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
@@ -315,6 +325,37 @@ describe('FeedComponent - sidebar colapsável', () => {
       await criar();
       expect(botaoAlternar().getAttribute('aria-expanded')).toBe('false');
       expect(q('.feed-page')?.classList.contains('sidebar-recolhida')).toBe(true);
+    });
+
+    it('em tela de toque (tablet) o menu fica sempre expandido, mesmo com o trilho salvo', async () => {
+      localStorage.setItem(SIDEBAR_RECOLHIDA_STORAGE_KEY, 'true');
+      await criar(false, true);
+
+      expect(fixture.componentInstance.toque()).toBe(true);
+      expect(fixture.componentInstance.trilho()).toBe(false);
+      expect(q('.feed-sidebar')?.classList.contains('recolhida')).toBe(false);
+      expect(q('.feed-page')?.classList.contains('sidebar-recolhida')).toBe(false);
+      // sem trilho não há botão de recolher, e os rótulos aparecem sem depender de tooltip
+      expect(q('.feed-sidebar-topo .sidebar-botao')).toBeNull();
+      expect(itens()[1].getAttribute('title')).toBeNull();
+    });
+
+    it('acompanha a troca do ponteiro (mouse <-> toque) sem apagar a preferência salva', async () => {
+      localStorage.setItem(SIDEBAR_RECOLHIDA_STORAGE_KEY, 'true');
+      await criar();
+      expect(fixture.componentInstance.trilho()).toBe(true);
+      expect(botaoAlternar()).toBeTruthy();
+
+      aoMudarToque?.({ matches: true });
+      fixture.detectChanges();
+      expect(fixture.componentInstance.trilho()).toBe(false);
+      expect(q('.feed-sidebar-topo .sidebar-botao')).toBeNull();
+
+      aoMudarToque?.({ matches: false });
+      fixture.detectChanges();
+      expect(fixture.componentInstance.trilho()).toBe(true);
+      expect(botaoAlternar().getAttribute('aria-expanded')).toBe('false');
+      expect(localStorage.getItem(SIDEBAR_RECOLHIDA_STORAGE_KEY)).toBe('true');
     });
 
     it('não quebra quando o localStorage está indisponível', async () => {
@@ -608,6 +649,32 @@ describe('FeedComponent - textos', () => {
     fixture.detectChanges();
     expect(q('.estado-erro p')?.textContent?.trim()).toBe('Não foi possível carregar os posts.');
   });
+
+  it('carregando, erro e vazio ficam em janelas com o caminho na barra de título', async () => {
+    await criar();
+    const titulo = (css: string): string | undefined =>
+      q(`${css} .janela-titulo`)?.textContent?.trim();
+
+    expect(titulo('.estado-carregando')).toBe('~/posts/');
+
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+    expect(titulo('.estado-vazio')).toBe('~/posts/');
+
+    fixture.componentInstance.selecionarCategoria('dotfiles');
+    http.expectOne('/api/posts?categoria=dotfiles').flush([]);
+    fixture.detectChanges();
+    expect(titulo('.estado-vazio')).toBe('~/dotfiles/');
+
+    fixture.componentInstance.carregarPosts();
+    http
+      .expectOne('/api/posts?categoria=dotfiles')
+      .flush('x', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+    expect(titulo('.estado-erro')).toBe('~/erro/');
+    expect(q('.estado-erro .estado-dica')?.textContent).toContain('Tente de novo');
+    expect(q('.estado-erro button')?.textContent?.trim()).toBe('Tentar de novo');
+  });
 });
 
 describe('FeedComponent - upvote', () => {
@@ -727,5 +794,167 @@ describe('FeedComponent - upvote', () => {
     expect(aviso?.classList.contains('voto-aviso-erro')).toBe(true);
     expect(aviso?.textContent).toContain('Não foi possível registrar seu voto');
     expect(q('.voto-aviso a')).toBeNull();
+  });
+});
+
+describe('FeedComponent - categoria na URL', () => {
+  let http: HttpTestingController;
+  let router: Router;
+
+  const post: Post = {
+    id: 1,
+    titulo: 'Arch ou Debian?',
+    resumo: 'Resumo',
+    categoria: 'distros',
+    autor: 'tux',
+    criadoEm: '2026-01-01T00:00:00Z',
+    score: 0,
+    totalComentarios: 0,
+    votadoPeloUsuario: false,
+  };
+
+  const criar = async (url = '/'): Promise<ComponentFixture<FeedComponent>> => {
+    await router.navigateByUrl(url);
+    const fixture = TestBed.createComponent(FeedComponent);
+    fixture.detectChanges();
+    return fixture;
+  };
+  const q = (fixture: ComponentFixture<FeedComponent>, css: string): HTMLElement | null =>
+    (fixture.nativeElement as HTMLElement).querySelector(css);
+
+  beforeEach(async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [FeedComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
+    http = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
+  });
+
+  afterEach(() => {
+    http.verify();
+    localStorage.clear();
+  });
+
+  it('abre direto na categoria que vem na URL', async () => {
+    const fixture = await criar('/?categoria=dotfiles');
+    http.expectOne('/api/posts?categoria=dotfiles').flush([]);
+
+    expect(fixture.componentInstance.categoriaAtiva()).toBe('dotfiles');
+  });
+
+  it('categoria inexistente na URL vira "Todos" e a URL é limpa', async () => {
+    const fixture = await criar('/?categoria=nao-existe');
+    http.expectOne('/api/posts').flush([]);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.categoriaAtiva()).toBeNull();
+    expect(router.url).toBe('/');
+  });
+
+  it('escolher uma categoria coloca na URL e "Todos" tira', async () => {
+    const fixture = await criar();
+    http.expectOne('/api/posts').flush([]);
+
+    fixture.componentInstance.escolherCategoria('distros');
+    http.expectOne('/api/posts?categoria=distros').flush([]);
+    await fixture.whenStable();
+    expect(router.url).toBe('/?categoria=distros');
+
+    fixture.componentInstance.escolherCategoria(null);
+    http.expectOne('/api/posts').flush([]);
+    await fixture.whenStable();
+    expect(router.url).toBe('/');
+  });
+
+  it('mudar a URL (como o Voltar do navegador) muda o filtro e recarrega', async () => {
+    const fixture = await criar('/?categoria=distros');
+    http.expectOne('/api/posts?categoria=distros').flush([]);
+
+    await router.navigateByUrl('/?categoria=dotfiles');
+    http.expectOne('/api/posts?categoria=dotfiles').flush([]);
+    expect(fixture.componentInstance.categoriaAtiva()).toBe('dotfiles');
+
+    await router.navigateByUrl('/');
+    http.expectOne('/api/posts').flush([]);
+    expect(fixture.componentInstance.categoriaAtiva()).toBeNull();
+  });
+
+  it('o título da aba acompanha a categoria e volta ao normal ao sair', async () => {
+    const titulo = TestBed.inject(Title);
+    const fixture = await criar('/?categoria=distros');
+    http.expectOne('/api/posts?categoria=distros').flush([]);
+    expect(titulo.getTitle()).toBe('Distros · TuxTalk');
+
+    fixture.componentInstance.escolherCategoria(null);
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+    expect(titulo.getTitle()).toBe('TuxTalk');
+
+    fixture.componentInstance.escolherCategoria('tiling-wms');
+    http.expectOne('/api/posts?categoria=tiling-wms').flush([]);
+    fixture.detectChanges();
+    expect(titulo.getTitle()).toBe('Tiling-wms · TuxTalk');
+
+    fixture.destroy();
+    expect(titulo.getTitle()).toBe('TuxTalk');
+  });
+
+  it('"limpar filtro" só aparece com categoria ativa e volta para "Todos"', async () => {
+    const fixture = await criar();
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+    expect(q(fixture, '.limpar-filtro')).toBeNull();
+
+    fixture.componentInstance.escolherCategoria('dotfiles');
+    http.expectOne('/api/posts?categoria=dotfiles').flush([]);
+    fixture.detectChanges();
+    const limpar = q(fixture, '.limpar-filtro') as HTMLButtonElement;
+    expect(limpar.textContent).toContain('limpar filtro');
+    expect(limpar.textContent).toContain('Dotfiles');
+
+    limpar.click();
+    http.expectOne('/api/posts').flush([]);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.categoriaAtiva()).toBeNull();
+    expect(q(fixture, '.limpar-filtro')).toBeNull();
+  });
+
+  it('cliques rápidos (categoria e logo "Todos") terminam em "Todos", sem recarregar a antiga', async () => {
+    const fixture = await criar();
+    http.expectOne('/api/posts').flush([]);
+
+    // Sem esperar a navegação da primeira escolha terminar.
+    fixture.componentInstance.escolherCategoria('distros');
+    http.expectOne('/api/posts?categoria=distros').flush([]);
+    fixture.componentInstance.escolherCategoria(null);
+    http.expectOne('/api/posts').flush([]);
+    await fixture.whenStable();
+
+    expect(fixture.componentInstance.categoriaAtiva()).toBeNull();
+    expect(router.url).toBe('/');
+  });
+
+  it('a resposta da categoria anterior não sobrescreve a atual', async () => {
+    const fixture = await criar();
+    const primeira = http.expectOne('/api/posts');
+
+    fixture.componentInstance.selecionarCategoria('distros');
+    const segunda = http.expectOne('/api/posts?categoria=distros');
+    expect(primeira.cancelled).toBe(true);
+
+    segunda.flush([post]);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.posts()).toEqual([post]);
+    expect(fixture.componentInstance.carregando()).toBe(false);
+  });
+
+  it('cancela a requisição pendente ao destruir a página', async () => {
+    const fixture = await criar();
+    const pendente = http.expectOne('/api/posts');
+
+    fixture.destroy();
+    expect(pendente.cancelled).toBe(true);
   });
 });

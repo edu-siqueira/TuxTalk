@@ -1,4 +1,4 @@
-<app-janela [titulo]="'~/' + caminho()" [prompt]="post.autor + '@tuxtalk'">
+<app-janela [titulo]="'~/' + caminho()">
   <article class="post-card">
     <div class="upvote-col">
       <button
@@ -19,7 +19,6 @@
       <h2 class="post-title">{{ post.titulo }}</h2>
       <p class="post-resumo">{{ post.resumo }}</p>
       <div class="post-meta">
-        <span class="categoria-badge">{{ post.categoria }}</span>
         <span class="post-autor tux-prompt">{{ post.autor }}</span>
         <span class="separador" aria-hidden="true">·</span>
         <time class="post-data" [attr.datetime]="post.criadoEm" [attr.title]="dataCompleta">{{ dataRelativa }}</time>

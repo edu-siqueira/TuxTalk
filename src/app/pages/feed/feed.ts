@@ -12,11 +12,15 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 import { AvisoVoto, PostCardComponent } from '../post/post';
 import { PainelComponent } from '../../components/painel/painel';
+import { JanelaComponent } from '../../components/janela/janela';
 import { PostService } from '../../services/Post.service';
 import { AuthService, TOKEN_STORAGE_KEY } from '../../services/Auth.service';
 import { Post } from '../../models/Post';
@@ -63,12 +67,16 @@ interface CategoriaFiltro {
 
 export const SIDEBAR_RECOLHIDA_STORAGE_KEY = 'tuxtalk_sidebar_recolhida';
 
+const TITULO_BASE = 'TuxTalk';
+
 const CONSULTA_MOBILE = '(max-width: 767.98px)';
+/** Ponteiro principal é toque (celular, tablet): não há hover, então `title` nunca aparece. */
+const CONSULTA_TOQUE = '(pointer: coarse)';
 
 @Component({
   selector: 'app-feed',
   standalone: true,
-  imports: [PostCardComponent, PainelComponent],
+  imports: [PostCardComponent, PainelComponent, JanelaComponent],
   templateUrl: './feed.html',
   styleUrls: ['./feed.scss'],
 })
@@ -76,6 +84,12 @@ export class FeedComponent implements OnInit {
   private readonly postService = inject(PostService);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly tituloAba = inject(Title);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Requisição de posts em andamento: a anterior é cancelada para uma resposta antiga não vencer. */
+  private cargaAtual?: Subscription;
 
   // Seed fixo, sem CRUD de categoria
   readonly categorias: CategoriaFiltro[] = [
@@ -98,8 +112,16 @@ export class FeedComponent implements OnInit {
   /** Viewport < 768px, via matchMedia (false se indisponível, ex.: jsdom). */
   readonly ehMobile = signal(false);
 
-  /** Trilho só vale no desktop. */
-  readonly trilho = computed(() => this.sidebarRecolhida() && !this.ehMobile());
+  /** Ponteiro de toque (false se matchMedia indisponível). */
+  readonly toque = signal(false);
+
+  /**
+   * Trilho só vale no desktop com mouse: no trilho o nome da categoria fica só no `title`
+   * (tooltip de hover), que não existe no toque. Em tablet o menu fica sempre expandido.
+   */
+  readonly trilho = computed(
+    () => this.sidebarRecolhida() && !this.ehMobile() && !this.toque(),
+  );
 
   categoriaAtiva = signal<string | null>(null);
   posts = signal<Post[]>([]);
@@ -123,6 +145,11 @@ export class FeedComponent implements OnInit {
       : 'Ainda não há posts por aqui.',
   );
 
+  /** Caminho na barra de título do estado vazio: a categoria filtrada, ou "posts" no geral. */
+  readonly caminhoVazio = computed(() =>
+    this.categoriaAtiva() ? `~/${this.categoriaAtiva()}/` : '~/posts/',
+  );
+
   /** Texto do anúncio para leitores de tela depois de carregar ("3 posts em Distros"). */
   readonly resumoResultados = computed(() => {
     if (this.carregando() || this.erro()) {
@@ -140,19 +167,59 @@ export class FeedComponent implements OnInit {
   readonly gavetaModal = computed(() => this.ehMobile() && this.gavetaAberta());
 
   constructor() {
+    this.observarToque();
     this.observarBreakpoint();
     afterNextRender(() => this.animar.set(true));
 
     effect(() => {
       document.documentElement.classList.toggle('tux-sem-rolagem', this.gavetaModal());
     });
-    inject(DestroyRef).onDestroy(() =>
-      document.documentElement.classList.remove('tux-sem-rolagem'),
-    );
+    // Título da aba acompanha o filtro ("Distros · TuxTalk") para histórico e abas serem legíveis.
+    effect(() => {
+      this.tituloAba.setTitle(
+        this.categoriaAtiva() ? `${this.rotuloCategoriaAtiva()} · ${TITULO_BASE}` : TITULO_BASE,
+      );
+    });
+
+    this.destroyRef.onDestroy(() => {
+      document.documentElement.classList.remove('tux-sem-rolagem');
+      this.cargaAtual?.unsubscribe();
+      this.tituloAba.setTitle(TITULO_BASE);
+    });
   }
 
   ngOnInit(): void {
+    // A URL (?categoria=slug) é a fonte do filtro: link compartilhado e recarregar abrem a categoria.
+    this.categoriaAtiva.set(this.slugValido(this.route.snapshot.queryParamMap.get('categoria')));
     this.carregarPosts();
+
+    // Voltar/avançar do navegador (ou edição manual da URL) muda o filtro sem recriar a página.
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const bruto = params.get('categoria');
+      const slug = this.slugValido(bruto);
+      if (bruto !== null && slug === null) {
+        this.sincronizarUrl(null, true); // categoria inexistente: mostra "Todos" e limpa a URL
+      }
+      this.selecionarCategoria(slug);
+    });
+  }
+
+  /** Só aceita slugs que existem no seed; qualquer outro valor vira "Todos". */
+  private slugValido(valor: string | null): string | null {
+    return this.categorias.some((c) => c.slug !== null && c.slug === valor) ? valor : null;
+  }
+
+  private sincronizarUrl(slug: string | null, substituir = false): void {
+    // Sem comparar com o snapshot da rota: ele fica velho enquanto uma navegação anterior ainda
+    // está pendente (clique em categoria e logo em "limpar filtro"). O Router ignora navegar
+    // para a mesma URL e cancela a navegação pendente quando chega uma nova, então a última vence.
+    // Merge com null remove o parâmetro: "Todos" fica em /feed, sem ?categoria=.
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { categoria: slug },
+      queryParamsHandling: 'merge',
+      replaceUrl: substituir,
+    });
   }
 
   alternarSidebar(): void {
@@ -245,9 +312,26 @@ export class FeedComponent implements OnInit {
 
   escolherCategoria(slug: string | null): void {
     this.selecionarCategoria(slug);
+    this.sincronizarUrl(slug);
     if (this.ehMobile()) {
       this.fecharGaveta();
     }
+  }
+
+  private observarToque(): void {
+    let consulta: MediaQueryList;
+    try {
+      consulta = window.matchMedia(CONSULTA_TOQUE);
+    } catch {
+      return; // matchMedia indisponível: assume mouse.
+    }
+    if (!consulta) {
+      return;
+    }
+    this.toque.set(consulta.matches);
+    const aoMudar = (e: MediaQueryListEvent) => this.toque.set(e.matches);
+    consulta.addEventListener?.('change', aoMudar);
+    this.destroyRef.onDestroy(() => consulta.removeEventListener?.('change', aoMudar));
   }
 
   private observarBreakpoint(): void {
@@ -365,7 +449,8 @@ export class FeedComponent implements OnInit {
     this.avisoVoto.set(null);
     this.carregando.set(true);
     this.erro.set(null);
-    this.postService.listar(this.categoriaAtiva() ?? undefined).subscribe({
+    this.cargaAtual?.unsubscribe();
+    this.cargaAtual = this.postService.listar(this.categoriaAtiva() ?? undefined).subscribe({
       next: (posts) => {
         this.posts.set(posts);
         this.carregando.set(false);

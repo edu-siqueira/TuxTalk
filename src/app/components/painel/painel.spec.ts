@@ -119,11 +119,12 @@ describe('PainelComponent', () => {
   });
 
   describe('botão de tema', () => {
-    it('começa com aria-label descritivo e aria-pressed="false" no tema escuro', () => {
+    it('começa com nome fixo "Tema claro" e aria-pressed="false" no tema escuro', () => {
       criar();
       const botao = seletor('.painel-tema');
 
-      expect(botao?.getAttribute('aria-label')).toBe('Usar tema claro');
+      // O nome não muda com o estado: quem diz se está ligado é o aria-pressed.
+      expect(botao?.getAttribute('aria-label')).toBe('Tema claro');
       expect(botao?.getAttribute('aria-pressed')).toBe('false');
       expect(botao?.querySelector('i')?.classList.contains('pi-moon')).toBe(true);
       expect(botao?.querySelector('i')?.getAttribute('aria-hidden')).toBe('true');

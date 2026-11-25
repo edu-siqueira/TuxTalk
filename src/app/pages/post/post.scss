@@ -38,9 +38,13 @@
   cursor: pointer;
   transition: background var(--tux-transition), color var(--tux-transition);
 
-  &:hover {
-    background: color-mix(in srgb, var(--tux-primary) 16%, transparent);
-    color: var(--tux-primary);
+  // Só onde há hover de verdade: no toque o :hover "gruda" depois do clique e a seta ficaria
+  // azul como se o voto tivesse sido registrado (o aviso de login aparece logo em seguida).
+  @media (hover: hover) {
+    &:hover {
+      background: color-mix(in srgb, var(--tux-primary) 16%, transparent);
+      color: var(--tux-primary);
+    }
   }
 
   &:focus-visible {
@@ -76,7 +80,7 @@
   min-width: 0; // permite o line-clamp funcionar dentro do flex item
 }
 
-// Conteúdo em Fira Sans; a mono fica no chrome (barra de título, upvote, badge).
+// Conteúdo em Fira Sans; a mono fica no chrome (barra de título, upvote).
 .post-title {
   color: var(--tux-text);
   font-size: var(--tux-fs-xl);
@@ -111,16 +115,6 @@
   color: var(--tux-text-muted);
   font-family: var(--tux-font);
 
-  .categoria-badge {
-    font-family: var(--tux-font-heading);
-    font-size: var(--tux-fs-xs);
-    color: var(--tux-accent);
-    background: color-mix(in srgb, var(--tux-accent) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--tux-accent) 55%, transparent);
-    padding: 0 var(--tux-space-2);
-    border-radius: var(--tux-radius-sm);
-  }
-
   .separador {
     color: var(--tux-text-muted);
   }
@@ -149,7 +143,12 @@
   font-family: var(--tux-font), monospace;
   font-size: var(--tux-fs-sm);
 
+  // Links "Entrar" / "Criar conta": alvo de toque de 40px (regra do sistema), não só a altura do texto.
   a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 var(--tux-space-2);
     color: var(--tux-primary);
     font-family: var(--tux-font-heading), monospace;
     font-weight: 500;
@@ -178,8 +177,7 @@
 .voto-aviso-acoes {
   display: inline-flex;
   align-items: center;
-  gap: var(--tux-space-2);
-  color: var(--tux-text-muted);
+  color: var(--tux-text-muted); // o respiro vem do padding dos links
 }
 
 .voto-aviso-fechar {

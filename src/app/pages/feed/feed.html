@@ -36,7 +36,7 @@
         >
           <i class="pi pi-times" aria-hidden="true"></i>
         </button>
-      } @else {
+      } @else if (!toque()) {
         <button
           type="button"
           class="sidebar-botao"
@@ -82,18 +82,27 @@
         <span class="feed-categoria-ativa">{{ rotuloCategoriaAtiva() }}</span>
       </h1>
 
-      <button
-        #botaoGaveta
-        type="button"
-        class="categorias-botao-mobile"
-        aria-controls="feed-sidebar"
-        [attr.aria-expanded]="ehMobile() && gavetaAberta()"
-        (click)="abrirGaveta()"
-      >
-        <i class="pi pi-bars" aria-hidden="true"></i>
-        <span>Categorias<span class="visually-hidden">:</span></span>
-        <span class="categorias-botao-ativa">{{ rotuloCategoriaAtiva() }}</span>
-      </button>
+      <div class="feed-cabecalho-acoes">
+        <button
+          #botaoGaveta
+          type="button"
+          class="categorias-botao-mobile"
+          aria-controls="feed-sidebar"
+          [attr.aria-expanded]="ehMobile() && gavetaAberta()"
+          (click)="abrirGaveta()"
+        >
+          <i class="pi pi-bars" aria-hidden="true"></i>
+          <span>Categorias<span class="visually-hidden">:</span></span>
+          <span class="categorias-botao-ativa">{{ rotuloCategoriaAtiva() }}</span>
+        </button>
+
+        @if (categoriaAtiva()) {
+          <button type="button" class="limpar-filtro" (click)="escolherCategoria(null)">
+            <i class="pi pi-times" aria-hidden="true"></i>
+            <span>limpar filtro<span class="visually-hidden">: {{ rotuloCategoriaAtiva() }}</span></span>
+          </button>
+        }
+      </div>
     </header>
 
     <div class="post-list" id="posts" tabindex="-1" #listaPosts>
@@ -108,27 +117,44 @@
         }
       }
 
+      <!-- Carregando, erro e vazio também são janelas: o feed nunca vira texto solto sobre o wallpaper. -->
       @if (carregando()) {
-        <p class="estado-carregando" role="status" aria-live="polite">
-          <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
-          Carregando posts…
-        </p>
+        <app-janela class="estado-carregando" titulo="~/posts/" role="status" aria-live="polite">
+          <div class="estado-corpo">
+            <i class="pi pi-spin pi-spinner estado-icone" aria-hidden="true"></i>
+            <p class="estado-dica">Carregando posts…</p>
+          </div>
+        </app-janela>
       } @else if (erro()) {
-        <div class="estado-erro" role="alert">
-          <p>{{ erro() }}</p>
-          <button type="button" class="tentar-de-novo" (click)="carregarPosts()">
-            Tentar de novo
-          </button>
-        </div>
+        <app-janela class="estado-erro" titulo="~/erro/" role="alert">
+          <div class="estado-corpo">
+            <i class="pi pi-exclamation-circle estado-icone" aria-hidden="true"></i>
+            <div class="estado-mensagem">
+              <p class="estado-titulo">{{ erro() }}</p>
+              <p class="estado-dica">Pode ser a conexão ou o servidor. Tente de novo em instantes.</p>
+              <button type="button" class="tentar-de-novo" (click)="carregarPosts()">
+                Tentar de novo
+              </button>
+            </div>
+          </div>
+        </app-janela>
       } @else if (posts().length === 0) {
-        <div class="estado-vazio">
-          <p>{{ textoVazio() }}</p>
-          @if (categoriaAtiva()) {
-            <button type="button" class="tentar-de-novo" (click)="escolherCategoria(null)">
-              Ver todos os posts
-            </button>
-          }
-        </div>
+        <app-janela class="estado-vazio" [titulo]="caminhoVazio()">
+          <div class="estado-corpo">
+            <i class="pi pi-folder-open estado-icone" aria-hidden="true"></i>
+            <div class="estado-mensagem">
+              <p class="estado-titulo">{{ textoVazio() }}</p>
+              @if (categoriaAtiva()) {
+                <p class="estado-dica">Veja o que a comunidade já publicou nas outras categorias.</p>
+                <button type="button" class="tentar-de-novo" (click)="escolherCategoria(null)">
+                  Ver todos os posts
+                </button>
+              } @else {
+                <p class="estado-dica">Quando alguém publicar, os posts aparecem aqui.</p>
+              }
+            </div>
+          </div>
+        </app-janela>
       }
 
       <!-- Anuncia o resultado do filtro para leitores de tela (o "Carregando" some sozinho). -->

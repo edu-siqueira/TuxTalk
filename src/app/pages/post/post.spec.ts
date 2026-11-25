@@ -55,11 +55,21 @@ describe('PostCardComponent', () => {
     expect(seletor('.janela-titulo')?.textContent).toContain('~/distros/');
   });
 
-  it('mostra o título como heading, a contagem do upvote e o badge de categoria', () => {
+  it('mostra o título como heading e a contagem do upvote', () => {
     expect(seletor('h2.post-title')?.textContent).toContain('Título de teste');
     expect(seletor('.upvote-btn')?.textContent).toContain('▲');
     expect(seletor('.score')?.textContent?.trim()).toBe('3');
-    expect(seletor('.categoria-badge')?.textContent).toContain('Distros');
+  });
+
+  it('não repete informação: categoria só no caminho e autor só na linha de meta', () => {
+    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+    expect(seletor('.categoria-badge')).toBeNull();
+    expect(seletor('.janela-prompt')).toBeNull();
+    expect(seletor('.janela-titulo')?.textContent).toContain('~/distros/');
+    expect(seletor('.post-meta .post-autor')?.textContent?.trim()).toBe('tux');
+    expect(texto.match(/tux/g)?.length).toBe(1); // o autor aparece uma vez só
+    expect(texto.match(/distros/gi)?.length).toBe(1); // a categoria, também
   });
 
   it('reflete o voto do usuário em aria-pressed e na classe votado', async () => {
