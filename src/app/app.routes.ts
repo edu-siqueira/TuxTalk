@@ -4,6 +4,8 @@ import { InicioComponent } from './pages/inicio/inicio';
 import { CadastroComponent } from './pages/cadastro/cadastro';
 import { FeedComponent } from './pages/feed/feed';
 import { QuizComponent } from './pages/quiz/quiz';
+import { PerfilComponent } from './pages/perfil/perfil';
+import { perfilRedirectGuard } from './guards/perfil.guard';
 
 export const routes: Routes = [
   {
@@ -30,5 +32,15 @@ export const routes: Routes = [
   {
     path: 'quiz',
     component: QuizComponent
+  },
+  {
+    path: 'u/:username',
+    component: PerfilComponent
+  },
+  {
+    // Sem tela própria: o guard sempre redireciona (login ou /u/<username>).
+    path: 'perfil',
+    canActivate: [perfilRedirectGuard],
+    children: []
   }
 ];

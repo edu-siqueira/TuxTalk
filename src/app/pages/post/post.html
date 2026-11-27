@@ -19,7 +19,7 @@
       <h2 class="post-title">{{ post.titulo }}</h2>
       <p class="post-resumo">{{ post.resumo }}</p>
       <div class="post-meta">
-        <span class="post-autor tux-prompt">{{ post.autor }}</span>
+        <a class="post-autor tux-prompt" [routerLink]="['/u', post.autor]">{{ post.autor }}</a>
         <span class="separador" aria-hidden="true">·</span>
         <time class="post-data" [attr.datetime]="post.criadoEm" [attr.title]="dataCompleta">{{ dataRelativa }}</time>
         <span class="comentarios">

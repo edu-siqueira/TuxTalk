@@ -63,6 +63,11 @@ describe('PainelComponent', () => {
   });
 
   describe('deslogado', () => {
+    it('não mostra o item Perfil', () => {
+      criar();
+      expect(seletor('.painel-tarefas a[aria-label="Perfil"]')).toBeNull();
+    });
+
     it('mostra Entrar e Criar conta e esconde Sair', () => {
       criar();
 
@@ -88,6 +93,14 @@ describe('PainelComponent', () => {
       expect(seletor('.painel-sair')?.getAttribute('aria-label')).toBe('Sair da conta');
       expect(seletor('.painel-entrar')).toBeNull();
       expect(seletor('.painel-criar')).toBeNull();
+    });
+
+    it('mostra o item Perfil apontando para /perfil com o ícone de usuário', () => {
+      localStorage.setItem(TOKEN_STORAGE_KEY, 'token-falso');
+      criar();
+
+      expect(href('.painel-tarefas a[aria-label="Perfil"]')).toBe('/perfil');
+      expect(seletor('.painel-tarefas a[aria-label="Perfil"] .pi-user')).toBeTruthy();
     });
 
     it('a marca aponta para /feed', () => {

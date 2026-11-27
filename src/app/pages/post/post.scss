@@ -8,6 +8,20 @@
   --janela-borda: color-mix(in srgb, var(--tux-primary) 55%, var(--tux-border));
 }
 
+// Autor é link para o perfil: mantém a cor do prompt, sublinha só no hover/foco.
+.post-autor {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tux-primary);
+    outline-offset: 2px;
+  }
+}
+
 .post-card {
   display: flex;
   align-items: flex-start;

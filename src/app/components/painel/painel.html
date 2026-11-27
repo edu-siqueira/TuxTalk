@@ -35,6 +35,18 @@
       <i class="pi pi-question-circle" aria-hidden="true"></i>
       <span class="painel-rotulo">Quiz</span>
     </a>
+    @if (estaLogado()) {
+      <a
+        class="painel-item"
+        routerLink="/perfil"
+        routerLinkActive="ativo"
+        ariaCurrentWhenActive="page"
+        aria-label="Perfil"
+      >
+        <i class="pi pi-user" aria-hidden="true"></i>
+        <span class="painel-rotulo">Perfil</span>
+      </a>
+    }
   </div>
 
   <div class="painel-bandeja">

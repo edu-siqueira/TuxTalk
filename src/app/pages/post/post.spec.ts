@@ -41,6 +41,12 @@ describe('PostCardComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('o nome do autor é link para /u/<autor>', () => {
+    const link = seletor('.post-meta a.post-autor');
+    expect(link?.getAttribute('href')).toBe('/u/tux');
+    expect(link?.textContent?.trim()).toBe('tux');
+  });
+
   it('should emit the post id on upvote click', () => {
     const emitidos: number[] = [];
     component.upvote.subscribe((id: number) => emitidos.push(id));

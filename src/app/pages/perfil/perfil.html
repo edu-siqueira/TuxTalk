@@ -1,0 +1,167 @@
+<app-painel (sair)="logout()" />
+
+<div class="perfil-page">
+  @switch (estado()) {
+    @case ('carregando') {
+      <app-janela class="perfil-estado" titulo="~/usuarios/" role="status" aria-live="polite">
+        <div class="estado-corpo">
+          <i class="pi pi-spin pi-spinner estado-icone" aria-hidden="true"></i>
+          <p class="estado-dica">Carregando perfil…</p>
+        </div>
+      </app-janela>
+    }
+
+    @case ('naoEncontrado') {
+      <app-janela class="perfil-estado" titulo="~/erro/" role="alert">
+        <div class="estado-corpo">
+          <i class="pi pi-user-minus estado-icone" aria-hidden="true"></i>
+          <div class="estado-mensagem">
+            <h1 class="estado-titulo">Usuário não encontrado</h1>
+            <p class="estado-dica">Confira o nome na URL ou volte para o feed.</p>
+            <a class="perfil-botao" routerLink="/feed">Ir para o feed</a>
+          </div>
+        </div>
+      </app-janela>
+    }
+
+    @case ('erro') {
+      <app-janela class="perfil-estado estado-erro" titulo="~/erro/" role="alert">
+        <div class="estado-corpo">
+          <i class="pi pi-exclamation-circle estado-icone" aria-hidden="true"></i>
+          <div class="estado-mensagem">
+            <h1 class="estado-titulo">Não foi possível carregar o perfil.</h1>
+            <p class="estado-dica">Pode ser a conexão ou o servidor. Tente de novo em instantes.</p>
+            <button type="button" class="perfil-botao" (click)="tentarDeNovo()">Tentar de novo</button>
+          </div>
+        </div>
+      </app-janela>
+    }
+
+    @case ('pronto') {
+      @let p = perfil()!;
+      <app-janela class="perfil-janela" [titulo]="'~/u/' + p.username">
+        <section class="perfil-cabecalho" aria-labelledby="perfil-nome">
+          <div class="perfil-avatar">
+            @if (avatarVisivel(); as url) {
+              <img [src]="url" alt="Avatar de {{ p.username }}" width="96" height="96" (error)="aoFalharAvatar()" />
+            } @else {
+              <span class="perfil-avatar-inicial" aria-hidden="true">{{ inicial() }}</span>
+            }
+          </div>
+
+          <div class="perfil-info">
+            <h1 class="perfil-nome" id="perfil-nome">{{ p.username }}</h1>
+            <p class="perfil-desde">
+              membro desde <time [attr.datetime]="p.criadoEm">{{ membroDesde() }}</time>
+            </p>
+            @if (p.proprio && p.email) {
+              <p class="perfil-email"><i class="pi pi-envelope" aria-hidden="true"></i> {{ p.email }}</p>
+            }
+            @if (p.bio) {
+              <p class="perfil-bio">{{ p.bio }}</p>
+            } @else if (!editando()) {
+              <p class="perfil-bio perfil-bio-vazia">Este usuário ainda não escreveu uma bio.</p>
+            }
+
+            <dl class="perfil-totais">
+              <div class="perfil-total">
+                <dt>posts:</dt>
+                <dd>{{ p.totalPosts }}</dd>
+              </div>
+              <div class="perfil-total">
+                <dt>upvotes recebidos:</dt>
+                <dd>{{ p.totalUpvotesRecebidos }}</dd>
+              </div>
+            </dl>
+
+            @if (p.proprio && !editando()) {
+              <button type="button" class="perfil-botao" (click)="abrirEdicao()">
+                <i class="pi pi-pencil" aria-hidden="true"></i>
+                <span>Editar perfil</span>
+              </button>
+            }
+          </div>
+        </section>
+
+        @if (p.proprio && editando()) {
+          <form class="perfil-form" [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+            <div class="perfil-campo">
+              <label for="perfil-bio">Bio</label>
+              <textarea id="perfil-bio" formControlName="bio" rows="4" aria-describedby="perfil-bio-contador"></textarea>
+              <p
+                id="perfil-bio-contador"
+                class="perfil-contador"
+                [class.excedido]="caracteresBio() > bioMax"
+              >
+                {{ caracteresBio() }}/{{ bioMax }}
+              </p>
+              @if (form.controls.bio.hasError('maxlength')) {
+                <p class="perfil-erro-campo" role="alert">A bio pode ter no máximo {{ bioMax }} caracteres.</p>
+              }
+              @if (errosCampos().bio; as msg) {
+                <p class="perfil-erro-campo perfil-erro-bio" role="alert">{{ msg }}</p>
+              }
+            </div>
+
+            <div class="perfil-campo">
+              <label for="perfil-avatar-url">URL do avatar</label>
+              <input
+                id="perfil-avatar-url"
+                type="url"
+                formControlName="avatarUrl"
+                placeholder="https://exemplo.com/avatar.png"
+                autocomplete="off"
+              />
+              @if (form.controls.avatarUrl.hasError('pattern')) {
+                <p class="perfil-erro-campo" role="alert">Use um endereço que comece com http:// ou https://.</p>
+              }
+              @if (form.controls.avatarUrl.hasError('maxlength')) {
+                <p class="perfil-erro-campo" role="alert">
+                  A URL pode ter no máximo {{ avatarUrlMax }} caracteres.
+                </p>
+              }
+              @if (errosCampos().avatarUrl; as msg) {
+                <p class="perfil-erro-campo perfil-erro-avatar" role="alert">{{ msg }}</p>
+              }
+            </div>
+
+            @if (erroSalvar()) {
+              <p class="perfil-erro-campo perfil-erro-salvar" role="alert">{{ erroSalvar() }}</p>
+            }
+
+            <div class="perfil-form-acoes">
+              <button type="submit" class="perfil-botao perfil-botao-primario" [disabled]="form.invalid || salvando()">
+                {{ salvando() ? 'Salvando…' : 'Salvar' }}
+              </button>
+              <button type="button" class="perfil-botao" [disabled]="salvando()" (click)="fecharEdicao()">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        }
+      </app-janela>
+
+      <h2 class="perfil-posts-titulo">
+        <span class="tux-prompt" aria-hidden="true">$</span> posts de {{ p.username }}
+      </h2>
+
+      <div class="perfil-posts">
+        @for (post of posts(); track post.id) {
+          <app-post-card
+            [post]="post"
+            [aviso]="avisoDoPost(post.id)"
+            (upvote)="onUpvote($event)"
+            (fecharAviso)="fecharAvisoVoto()"
+          ></app-post-card>
+        } @empty {
+          <app-janela class="perfil-estado" titulo="~/posts/">
+            <div class="estado-corpo">
+              <i class="pi pi-folder-open estado-icone" aria-hidden="true"></i>
+              <p class="estado-titulo">Nenhum post por aqui ainda.</p>
+            </div>
+          </app-janela>
+        }
+      </div>
+    }
+  }
+</div>
