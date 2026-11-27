@@ -3,6 +3,7 @@ import { LoginComponent } from './pages/login/login';
 import { InicioComponent } from './pages/inicio/inicio';
 import { CadastroComponent } from './pages/cadastro/cadastro';
 import { FeedComponent } from './pages/feed/feed';
+import { QuizComponent } from './pages/quiz/quiz';
 
 export const routes: Routes = [
   {
@@ -25,5 +26,9 @@ export const routes: Routes = [
   {
     path: 'feed',
     component: FeedComponent
+  },
+  {
+    path: 'quiz',
+    component: QuizComponent
   }
 ];

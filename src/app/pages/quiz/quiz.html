@@ -1,0 +1,140 @@
+<app-painel (sair)="logout()" />
+
+<div class="quiz-page">
+  <h1 class="visually-hidden">Quiz: descubra sua distro</h1>
+
+  <app-janela class="quiz-janela" titulo="~/descubra-sua-distro" [prompt]="caminho()">
+    <div class="quiz-tela">
+      @switch (tela()) {
+        @case ('intro') {
+          <div class="quiz-intro">
+            <h2 #titulo class="quiz-titulo" tabindex="-1">
+              <span class="tux-prompt" aria-hidden="true">$</span> ./descubra-sua-distro.sh
+            </h2>
+            <p class="quiz-intro-texto">
+              {{ total }} perguntas rápidas sobre como você usa (ou pretende usar) Linux no dia a dia.
+              No final, uma recomendação, sem enrolação.
+            </p>
+            <button type="button" class="quiz-botao quiz-botao-primario" (click)="iniciar()">
+              <i class="pi pi-play" aria-hidden="true"></i>
+              <span>Iniciar</span>
+            </button>
+          </div>
+        }
+
+        @case ('pergunta') {
+          <div class="quiz-pergunta">
+            <h2 #titulo id="quiz-pergunta-titulo" class="quiz-titulo" tabindex="-1">
+              <span class="quiz-numero" aria-hidden="true">#{{ indice() + 1 }}/{{ total }}</span>
+              {{ perguntaAtual().texto }}
+            </h2>
+
+            <div class="quiz-opcoes" role="group" aria-labelledby="quiz-pergunta-titulo">
+              @for (opcao of perguntaAtual().opcoes; track $index) {
+                <button
+                  type="button"
+                  class="quiz-opcao"
+                  [class.selecionada]="respostaAtual() === $index"
+                  [attr.aria-pressed]="respostaAtual() === $index"
+                  [attr.aria-keyshortcuts]="$index + 1"
+                  (click)="responder($index)"
+                >
+                  <kbd class="quiz-tecla" aria-hidden="true">{{ $index + 1 }}</kbd>
+                  <span class="quiz-opcao-rotulo">{{ opcao.rotulo }}</span>
+                </button>
+              }
+            </div>
+
+            <div class="quiz-rodape">
+              <div
+                class="quiz-progresso"
+                role="progressbar"
+                aria-label="Progresso do quiz"
+                aria-valuemin="1"
+                [attr.aria-valuemax]="total"
+                [attr.aria-valuenow]="indice() + 1"
+                [attr.aria-valuetext]="'Pergunta ' + (indice() + 1) + ' de ' + total"
+              >
+                @for (pergunta of perguntas; track $index) {
+                  <span class="quiz-progresso-segmento" [class.concluido]="$index <= indice()"></span>
+                }
+              </div>
+
+              @if (indice() > 0) {
+                <button type="button" class="quiz-botao quiz-botao-secundario" (click)="voltar()">
+                  <i class="pi pi-arrow-left" aria-hidden="true"></i>
+                  <span>Voltar</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        @case ('resultado') {
+          @let r = resultado();
+          <article class="quiz-resultado">
+            <div class="quiz-resultado-topo">
+              <h2 #titulo class="quiz-distro-nome" tabindex="-1">
+                <span class="visually-hidden">Sua distro: </span>{{ r.vencedora.nome }}
+              </h2>
+              <p class="quiz-distro-tag">{{ r.vencedora.tag }}</p>
+              <dl class="quiz-campos">
+                <div class="quiz-campo">
+                  <dt>base:</dt>
+                  <dd>{{ r.vencedora.base }}</dd>
+                </div>
+                <div class="quiz-campo">
+                  <dt>pacotes:</dt>
+                  <dd>{{ r.vencedora.pacotes }}</dd>
+                </div>
+                <div class="quiz-campo">
+                  <dt>desktop:</dt>
+                  <dd>{{ r.vencedora.desktop }}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <p class="quiz-porque">
+              @for (segmento of r.vencedora.porque; track $index) {
+                @if (segmento.destaque) {
+                  <strong class="quiz-destaque">{{ segmento.texto }}</strong>
+                } @else {
+                  <span>{{ segmento.texto }}</span>
+                }
+              }
+            </p>
+
+            <p class="quiz-segunda">
+              quase foi <strong class="quiz-segunda-nome">{{ r.segunda.nome }}</strong> — se essa
+              recomendação não bater, vale testar também.
+            </p>
+
+            <div class="quiz-acoes">
+              <a
+                class="quiz-botao quiz-botao-primario"
+                [href]="r.vencedora.link"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>Baixar / ver site oficial</span>
+                <span class="visually-hidden"> (abre em nova aba)</span>
+                <i class="pi pi-external-link" aria-hidden="true"></i>
+              </a>
+              <button type="button" class="quiz-botao quiz-botao-secundario" (click)="voltar()">
+                <i class="pi pi-arrow-left" aria-hidden="true"></i>
+                <span>Voltar</span>
+              </button>
+              <button type="button" class="quiz-botao quiz-botao-secundario" (click)="refazer()">
+                <i class="pi pi-refresh" aria-hidden="true"></i>
+                <span>Refazer quiz</span>
+              </button>
+            </div>
+          </article>
+        }
+      }
+    </div>
+  </app-janela>
+
+  <!-- Anuncia a nova pergunta/resultado; o foco vai para o título da tela. -->
+  <p class="visually-hidden" role="status" aria-live="polite">{{ anuncio() }}</p>
+</div>

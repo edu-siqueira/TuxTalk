@@ -46,11 +46,13 @@ describe('PainelComponent', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('mostra os itens de tarefa Início e Feed com os links certos', () => {
+  it('mostra os itens de tarefa Início, Feed e Quiz com os links certos', () => {
     criar();
 
     expect(href('.painel-tarefas a[aria-label="Início"]')).toBe('/inicio');
     expect(href('.painel-tarefas a[aria-label="Feed"]')).toBe('/feed');
+    expect(href('.painel-tarefas a[aria-label="Quiz"]')).toBe('/quiz');
+    expect(seletor('.painel-tarefas a[aria-label="Quiz"] .pi-question-circle')).toBeTruthy();
   });
 
   it('usa a logo pequena e uma marca TuxTalk', () => {

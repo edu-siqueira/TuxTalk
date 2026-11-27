@@ -1,0 +1,270 @@
+:host {
+  display: block;
+}
+
+// Tudo herda a fonte mono; só o texto corrido (opções, "porque") volta para --tux-font.
+.quiz-page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--tux-space-5);
+  font: var(--tux-fs-md) / 1.5 var(--tux-font-heading);
+}
+
+.quiz-tela {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--tux-space-5);
+  min-height: 15rem;
+}
+
+// Os títulos recebem foco programático ao trocar de tela, sem anel na caixa inteira.
+.quiz-titulo,
+.quiz-distro-nome {
+  &:focus {
+    outline: none;
+  }
+}
+
+.quiz-titulo {
+  margin: 0 0 var(--tux-space-4);
+  font-size: var(--tux-fs-lg);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+// ---- botões: anel de foco e transições (inclusive reduced-motion) vêm de styles.scss ----
+.quiz-botao,
+.quiz-opcao {
+  border: 1px solid var(--tux-border);
+  border-radius: var(--tux-radius-md);
+  cursor: pointer;
+}
+
+.quiz-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tux-space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--tux-space-4);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.quiz-botao-primario {
+  background: var(--tux-primary);
+  border-color: var(--tux-primary);
+  color: var(--tux-primary-text);
+
+  &:hover {
+    background: color-mix(in srgb, var(--tux-primary) 85%, var(--tux-text));
+  }
+}
+
+.quiz-botao-secundario {
+  background: transparent;
+  color: var(--tux-text-muted);
+
+  &:hover {
+    border-color: var(--tux-primary);
+    color: var(--tux-text);
+  }
+}
+
+// ---- intro: cursor de bloco piscando depois do comando ----
+.quiz-intro {
+  .quiz-titulo {
+    // Em 360px o comando inteiro (com o cursor) precisa caber em uma linha.
+    font-size: clamp(var(--tux-fs-lg), 4.2vw, var(--tux-fs-xl));
+
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 0.6em;
+      height: 1.1em;
+      margin-left: 0.3em;
+      vertical-align: text-bottom;
+      background: var(--tux-accent);
+      animation: tux-cursor-blink 1.1s steps(1) infinite;
+    }
+  }
+
+  .quiz-botao {
+    align-self: flex-start;
+  }
+}
+
+.quiz-intro-texto {
+  max-width: 46ch;
+  margin: 0 0 var(--tux-space-5);
+  color: var(--tux-text-muted);
+  font: var(--tux-fs-lg) / 1.6 var(--tux-font);
+}
+
+// ---- pergunta ----
+.quiz-pergunta,
+.quiz-resultado {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.quiz-numero {
+  color: var(--tux-text-muted);
+}
+
+.quiz-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tux-space-2);
+}
+
+.quiz-opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tux-space-3);
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--tux-space-3);
+  background: transparent;
+  color: var(--tux-text);
+  font: var(--tux-fs-lg) / 1.4 var(--tux-font);
+  text-align: left;
+
+  &:hover {
+    background: color-mix(in srgb, var(--tux-primary) 12%, transparent);
+    border-color: var(--tux-primary);
+  }
+
+  // Resposta já dada (ao voltar para a pergunta): chip da tecla vira sólido.
+  &.selecionada {
+    background: color-mix(in srgb, var(--tux-primary) 16%, transparent);
+    border-color: var(--tux-primary);
+
+    .quiz-tecla {
+      background: var(--tux-primary);
+      color: var(--tux-primary-text);
+    }
+  }
+}
+
+.quiz-tecla {
+  flex: none;
+  min-width: 1.5rem;
+  background: color-mix(in srgb, var(--tux-primary) 8%, transparent);
+  border: 1px solid var(--tux-primary);
+  border-radius: var(--tux-radius-sm);
+  color: var(--tux-primary);
+  font: var(--tux-fs-sm) / 1.375rem var(--tux-font-heading);
+  text-align: center;
+}
+
+.quiz-rodape,
+.quiz-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tux-space-3);
+  margin-top: auto;
+  padding-top: var(--tux-space-5);
+}
+
+.quiz-progresso {
+  display: flex;
+  flex: 1 1 10rem;
+  gap: var(--tux-space-1);
+}
+
+.quiz-progresso-segmento {
+  flex: 1;
+  height: 0.1875rem;
+  background: var(--tux-border);
+  border-radius: 2px;
+
+  &.concluido {
+    background: var(--tux-accent);
+  }
+}
+
+// ---- resultado ----
+.quiz-resultado-topo {
+  margin-bottom: var(--tux-space-4);
+  padding: var(--tux-space-4);
+  background: color-mix(in srgb, var(--tux-bg) 50%, transparent);
+  border: 1px solid var(--tux-border-subtle);
+  border-radius: var(--tux-radius-md);
+}
+
+.quiz-distro-nome {
+  margin: 0;
+  color: var(--tux-accent);
+  font-size: var(--tux-fs-xl);
+}
+
+.quiz-distro-tag,
+.quiz-segunda {
+  margin: 0 0 var(--tux-space-3);
+  color: var(--tux-text-muted);
+  font-size: var(--tux-fs-sm);
+}
+
+.quiz-campos {
+  margin: 0;
+  line-height: 1.9;
+}
+
+.quiz-campo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--tux-space-2);
+
+  dt {
+    color: var(--tux-primary);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.quiz-porque {
+  margin: 0 0 var(--tux-space-3);
+  font: var(--tux-fs-lg) / 1.65 var(--tux-font);
+}
+
+.quiz-destaque {
+  color: var(--tux-accent);
+}
+
+// Download na primeira linha, inteira; "Voltar" e "Refazer" dividem a segunda em metades iguais.
+.quiz-acoes {
+  gap: var(--tux-space-4);
+
+  .quiz-botao {
+    justify-content: center;
+  }
+
+  .quiz-botao-primario {
+    flex: 1 0 100%;
+  }
+
+  .quiz-botao-secundario {
+    flex: 1 1 0;
+  }
+}
+
+// O último parágrafo não precisa da margem inferior do grupo acima.
+.quiz-segunda {
+  margin: 0;
+}
+
+.quiz-segunda-nome {
+  color: var(--tux-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quiz-intro .quiz-titulo::after {
+    animation: none;
+  }
+}
